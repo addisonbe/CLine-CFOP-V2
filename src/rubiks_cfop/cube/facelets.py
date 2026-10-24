@@ -45,6 +45,7 @@ __all__ = [
     "SOLVED_FACELETS",
     "Color",
     "Face",
+    "canonicalize_colors",
     "centers_are_canonical",
     "face_facelets",
     "face_index",
@@ -241,6 +242,34 @@ def centers_are_canonical(text: str) -> bool:
     """
     normalized = normalize_facelets(text)
     return all(normalized[facelet_index(face, 5)] == face.value for face in FACE_ORDER)
+
+
+def canonicalize_colors(text: str) -> str:
+    """Relabel the colours so that every centre carries its own face's colour.
+
+    A whole cube rotation permutes which colours appear on which face.  Relabelling
+    the colours -- instead of moving the stickers -- keeps the physical arrangement
+    intact while naming the faces the way the viewer sees them: the colour on the
+    bottom face becomes ``D``, the one on the front becomes ``F``, and so on.  The
+    solvers' piece coordinates are expressed in this frame.
+
+    Args:
+        text: A facelet string.
+
+    Returns:
+        The relabelled string, with canonical centres.
+
+    Raises:
+        InvalidStateError: If the six centres are not six distinct colours.
+    """
+    normalized = normalize_facelets(text)
+    mapping: dict[str, str] = {}
+    for face in FACE_ORDER:
+        center = normalized[facelet_index(face, 5)]
+        if center in mapping:
+            raise InvalidStateError("the six centre colours must be distinct")
+        mapping[center] = face.value
+    return "".join(mapping[letter] for letter in normalized)
 
 
 def is_solved_facelets(text: str) -> bool:

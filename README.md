@@ -88,8 +88,8 @@ coverage floor must pass before the stage is committed.
 | 2a | Random-move scrambler | ✅ |
 | 2b | Random-state scrambler (WCA 4b3) via two-phase solver | ✅ |
 | 3 | Unfolded net renderer (real colours, structured layout) | ✅ |
-| 4 | Search infrastructure (BFS/IDA\*, pruning tables, filters) | ⏳ |
-| 5 | Cross solver (chosen colour or best of six) | ⏳ |
+| 4 | Search infrastructure (BFS distance tables, pruning, move filters) | ✅ |
+| 5 | Cross solver (optimal, chosen colour or best of six) | ✅ |
 | 6 | F2L (JSON table + verified search fallback) | ⏳ |
 | 7 | OLL (57 numbered cases + 2-look fallback) | ⏳ |
 | 8 | PLL (21 named cases + 2-look fallback) | ⏳ |

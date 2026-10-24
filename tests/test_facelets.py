@@ -13,6 +13,7 @@ from rubiks_cfop.cube.facelets import (
     SOLVED_FACELETS,
     Color,
     Face,
+    canonicalize_colors,
     centers_are_canonical,
     face_facelets,
     face_index,
@@ -139,6 +140,24 @@ def test_centers_are_canonical() -> None:
     assert centers_are_canonical(SOLVED_FACELETS)
     rotated = "D" * 9 + "U" * 9 + SOLVED_FACELETS[18:]
     assert not centers_are_canonical(rotated)
+
+
+def test_canonicalize_colors_relabels_without_moving_stickers() -> None:
+    """Relabelling names the faces the way the viewer sees them."""
+    swapped = (
+        SOLVED_FACELETS[27:36] + SOLVED_FACELETS[9:27] + SOLVED_FACELETS[0:9] + SOLVED_FACELETS[36:]
+    )
+    assert canonicalize_colors(SOLVED_FACELETS) == SOLVED_FACELETS
+    assert canonicalize_colors(swapped) == SOLVED_FACELETS
+    assert centers_are_canonical(canonicalize_colors(swapped))
+
+
+def test_canonicalize_colors_rejects_duplicate_centres() -> None:
+    facelets = list(SOLVED_FACELETS)
+    facelets[4] = facelets[13]  # two centres now show R
+    facelets[9] = "U"  # keep the counts balanced
+    with pytest.raises(InvalidStateError, match="six centre colours"):
+        canonicalize_colors("".join(facelets))
 
 
 def test_is_solved_facelets() -> None:

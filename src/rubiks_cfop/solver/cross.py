@@ -24,7 +24,7 @@ from typing import Final
 
 from rubiks_cfop.cube.cube import Cube
 from rubiks_cfop.cube.cubie import EDGE_COUNT, CubieCube, move_cubie
-from rubiks_cfop.cube.facelets import FACE_COLOR, Color, Face
+from rubiks_cfop.cube.facelets import FACE_COLOR, Color, Face, canonicalize_colors
 from rubiks_cfop.cube.moves import Move, get_move, rotations
 from rubiks_cfop.cube.notation import format_moves
 from rubiks_cfop.errors import InvalidStateError
@@ -305,8 +305,10 @@ def solve_cross_for_color(cube: Cube, color: Color | str) -> CrossResult:
     resolved = Color(color)
     rotation = _rotations_to_bottom()[resolved]
     reoriented = cube.apply_moves(rotation)
-    # Project in the display frame: the bottom layer is the one the viewer sees.
-    moves = solve_cross(CubieCube.from_facelets(reoriented.facelets, normalize_rotation=False))
+    # Name the faces the way the viewer sees them, so that the cross table's "D
+    # layer" means the displayed bottom layer and "D" means the chosen colour.
+    frame = CubieCube.from_facelets(canonicalize_colors(reoriented.facelets))
+    moves = solve_cross(frame)
     return CrossResult(
         color=resolved,
         rotation=rotation,

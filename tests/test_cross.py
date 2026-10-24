@@ -61,16 +61,17 @@ def test_solutions_are_optimal_and_solve_the_cross(index: int) -> None:
     assert len(moves) == cross_distance()[cross_state(cube.cubie())]
 
 
+def test_display_check_rejects_an_unsolved_cross() -> None:
+    assert not cross_solved_in_display(Cube.solved().apply("R"))
+    unsolved = scrambled_cubes(1, seed=11)[0]
+    if not cross_solved_in_display(unsolved):
+        assert not cross_solved_in_display(unsolved.apply_moves([]))
+
+
 def test_solved_cube_needs_no_cross_moves() -> None:
     assert solve_cross(CubieCube.solved()) == ()
 
 
-@pytest.mark.xfail(
-    reason="known issue: the display frame and the cubie frame disagree after a "
-    "reorientation, so the cross is solved in the wrong frame; see the stage 4 "
-    "notes in the README",
-    strict=False,
-)
 def test_cross_is_in_the_bottom_layer() -> None:
     for cube in scrambled_cubes(10):
         result = solve_best_cross(cube)
@@ -78,10 +79,6 @@ def test_cross_is_in_the_bottom_layer() -> None:
         assert result.after.face_facelets("D")[4] == result.before.face_facelets("D")[4]
 
 
-@pytest.mark.xfail(
-    reason="known issue: same display frame problem as test_cross_is_in_the_bottom_layer",
-    strict=False,
-)
 def test_every_colour_can_be_chosen() -> None:
     for cube in scrambled_cubes(3):
         for color in Color:
