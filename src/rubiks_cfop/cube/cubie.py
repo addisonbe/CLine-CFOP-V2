@@ -212,19 +212,25 @@ class CubieCube:
         )
 
     @classmethod
-    def from_facelets(cls, facelets: str) -> CubieCube:
+    def from_facelets(cls, facelets: str, *, normalize_rotation: bool = True) -> CubieCube:
         """Project a facelet string onto the cubie level.
 
         Any whole cube rotation is undone first, so a rotated state projects onto
         the same cubie state as its unrotated equivalent: the projection describes
         the physical cube relative to its own centres, not the way it is held.
 
+        Set ``normalize_rotation`` to ``False`` to project in the *display* frame
+        instead: the piece identities then follow the colours the viewer sees, and
+        the bottom layer means the bottom layer of the displayed cube.  The solvers
+        use that when they have reoriented the cube on purpose.
+
         Raises:
             InvalidStateError: If the facelets do not describe a cube, for
                 example a corner without any up or down sticker, or a piece
                 combination that does not exist.
         """
-        facelets = normalized_facelets(facelets)
+        if normalize_rotation:
+            facelets = normalized_facelets(facelets)
         cp: list[int] = []
         co: list[int] = []
         for position, facelets_of_corner in enumerate(_CORNER_FACELET_INDEX):
