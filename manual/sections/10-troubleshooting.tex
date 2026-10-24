@@ -1,0 +1,72 @@
+\section{Troubleshooting and known limitations}
+\label{sec:trouble}
+
+\subsection{Symptoms and what they mean}
+
+\begin{longtable}{@{}p{5.4cm}p{9cm}@{}}
+\toprule
+Symptom & Cause and remedy \\
+\midrule
+\endhead
+The first solve takes ten seconds & The scrambler tables are being built.  They are
+cached for the life of the process; call \texttt{preload()} at start-up to pay the
+cost once, on a thread of your own. \\
+\texttt{error: not WCA move notation} & A token in the scramble is not a move.  The
+message names the token and its index; \texttt{3Rw} and \texttt{1Rw} are invalid on
+a $3\times3\times3$. \\
+\texttt{error: the corner orientation sum must be divisible by three} & The state is
+impossible: a single corner is twisted.  Re-check the facelets, or the tool that
+produced them. \\
+\texttt{error: each colour must appear exactly nine times} & A facelet string with
+nine of each colour is the minimum requirement; a missing or duplicated sticker
+usually means a transcription slip. \\
+\texttt{error: the last layer does not match any case} & The last layer is not in a
+state the tables know.  The pipeline normally catches this and finishes with the
+two-phase solver; seeing the error directly means a table file is damaged. \\
+\texttt{SearchLimitError} & A search was given too small a depth budget.  Raise
+\texttt{SearchLimits.max\_total\_depth} (the default of 30 is generous) or let the
+pair search run to its default depth of twelve. \\
+\texttt{SolveTimeoutError} & A solve exceeded \texttt{SearchLimits.timeout\_ms}.
+Scramble generation uses a one second budget per attempt and redraws a state that
+overruns; a longer budget simply waits. \\
+\texttt{CancelledError} & Someone called \texttt{CancelToken.cancel()}.  Expected
+when an interface abandons a solve; reuse the token with \texttt{reset()}. \\
+Solving feels slow & The F2L search is doing the work: the 41-case table only
+covers configurations whose pieces are in the U layer or the slot.  Correct, but a
+second or two per pair. \\
+The net looks upside down & It is: the cross is at the bottom.  The
+\texttt{Orientation} line says how the cube was turned to get there. \\
+\bottomrule
+\end{longtable}
+
+\subsection{Known limitations}
+
+\begin{enumerate}[leftmargin=1.4em]
+  \item \textbf{F2L speed.}  The largest available improvement.  A complete table
+  over the 576 pair configurations (or an explicit extraction step before the case
+  table) would remove the search from the common path.
+  \item \textbf{Last-layer naming.}  For a small number of states the stored
+  algorithm does not finish the cube; the pipeline completes it with the two-phase
+  solver instead of a named case.  The solution is still correct and verified, but
+  the stage is reported as such rather than as \texttt{OLL (\textit{n})}.
+  \item \textbf{Rotations inside algorithms.}  A few published algorithms include a
+  rotation or a wide or slice move.  The stage re-orients the display afterwards so
+  the cube stays cross-down; the solution remains valid, and the printed move list
+  contains those rotations.
+  \item \textbf{One puzzle.}  Only the $3\times3\times3$ is supported.  The cube
+  model, the notation layer and the notation grammar are written for a cube of six
+  faces and would need work for larger puzzles.
+\end{enumerate}
+
+\subsection{Verifying an installation}
+
+\begin{lstlisting}[style=shell]
+scripts/check.sh          # ruff format --check, ruff check, full pytest
+uv run rubiks-cfop --scramble "R U R' U' F2 D" --no-color
+\end{lstlisting}
+
+The test suite covers the move tables (against Kociemba's published permutations),
+the parser, the cubie invariants, both scramblers, the cross solver's optimality,
+the F2L tables, exhaustive coverage of the last layer, the pipeline's stage order
+and output format, and the command line itself.  A green run is the quickest proof
+that the installation is sound.

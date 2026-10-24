@@ -1,0 +1,125 @@
+\section{Command line reference}
+\label{sec:cli}
+
+\begin{lstlisting}[style=shell]
+rubiks-cfop [--scramble MOVES | --facelets STATE | --random]
+            [--scramble-style {random-state,random-move}] [--seed N]
+            [--cross {best,white,red,green,yellow,orange,blue}]
+            [--color | --no-color] [--json] [--cross-options]
+\end{lstlisting}
+
+\subsection{Where the cube comes from}
+
+Exactly one of these three sources is used.  With none of them the program behaves
+as if \texttt{--random} had been given.
+
+\begin{longtable}{@{}p{3.2cm}p{11.2cm}@{}}
+\toprule
+Option & Meaning \\
+\midrule
+\endhead
+\texttt{--scramble MOVES} &
+Apply a scramble in WCA notation to a solved cube.  Wide moves
+(\texttt{Rw}, \texttt{2Rw}), rotations (\texttt{x y z}) and slice moves
+(\texttt{M E S}) are accepted, as are the usual aliases (\texttt{r} for
+\texttt{Rw}, \texttt{m} for \texttt{M}).  Invalid notation is reported with the
+offending token and its position, and the program exits with status 2. \\
+\texttt{--facelets STATE} &
+Start from a 54 character Kociemba facelet string instead of a scramble.  Useful
+when another tool produced the state, or when you want to solve a state you built
+by hand.  Whitespace and lower case are ignored; impossible states (a twisted
+corner, a wrong colour count, moved centres) are rejected. \\
+\texttt{--random} &
+Generate a scramble and solve it.  This is the default. \\
+\bottomrule
+\end{longtable}
+
+\subsection{How the scramble is generated}
+
+\begin{longtable}{@{}p{3.2cm}p{11.2cm}@{}}
+\toprule
+Option & Meaning \\
+\midrule
+\endhead
+\texttt{--scramble-style} &
+\texttt{random-state} (default) draws a uniformly random cube state and solves it,
+which is what WCA Regulation 4b3 requires; scrambles are 20 to 22 moves.
+\texttt{random-move} produces a filtered random-move sequence of 20 face turns
+instead --- instant, but \emph{not} WCA-legal for the $3\times3\times3$. \\
+\texttt{--seed N} &
+Seed for a generated scramble.  The same seed always gives the same scramble, and
+the seed is echoed in the JSON payload.  Without a seed one is drawn from the
+operating system and reported, so any run can be reproduced. \\
+\bottomrule
+\end{longtable}
+
+\subsection{How it is solved}
+
+\begin{longtable}{@{}p{3.2cm}p{11.2cm}@{}}
+\toprule
+Option & Meaning \\
+\midrule
+\endhead
+\texttt{--cross} &
+The colour of the cross: \texttt{white}, \texttt{yellow}, \texttt{green},
+\texttt{blue}, \texttt{red} or \texttt{orange}.  \texttt{best} (the default) solves
+all six crosses and keeps the shortest, breaking ties in the order white, yellow,
+green, blue, red, orange.  The cube is always reoriented so that the chosen colour
+ends up in the \emph{bottom} layer. \\
+\texttt{--cross-options} &
+Before solving, print the six crosses with their lengths, shortest first. \\
+\bottomrule
+\end{longtable}
+
+\subsection{How it is presented}
+
+\begin{longtable}{@{}p{3.2cm}p{11.2cm}@{}}
+\toprule
+Option & Meaning \\
+\midrule
+\endhead
+\texttt{--color} &
+Force ANSI truecolour output, using 24-bit background colours and the standard
+cubing palette. \\
+\texttt{--no-color} &
+Draw the net with coloured square characters instead, so the output survives being
+redirected to a file or pasted into a document.  The default is automatic: colours
+when standard output is a terminal, squares otherwise. \\
+\texttt{--json} &
+Print the machine-readable payload instead of the human listing. \\
+\texttt{-h}, \texttt{--help} &
+Usage summary. \\
+\bottomrule
+\end{longtable}
+
+\subsection{Exit codes}
+
+\begin{center}
+\begin{tabular}{@{}cl@{}}
+\toprule
+Code & Meaning \\
+\midrule
+0 & A solution was produced (and verified). \\
+2 & The input could not be understood --- bad notation, an impossible state --- or
+the cube could not be solved.  The reason is written to standard error, prefixed
+with \texttt{error:}. \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Examples}
+
+\begin{lstlisting}[style=shell]
+# a scramble from a competition
+uv run rubiks-cfop --scramble "D B2 F2 L2 U' F2 U B2 R2 U"
+
+# reproducible random-state scramble, plain output for a log
+uv run rubiks-cfop --random --seed 7 --no-color
+
+# solve a state produced elsewhere, with a white cross of my choosing
+uv run rubiks-cfop --facelets UULUUFUUFRRUBRRURRFFDFFUFFFDDRDDDDDDBLLLLLLLLBRRBBBBBB \
+                   --cross white
+
+# machine readable, for a script
+uv run rubiks-cfop --scramble "R U R' U'" --json | jq .total_moves
+\end{lstlisting}

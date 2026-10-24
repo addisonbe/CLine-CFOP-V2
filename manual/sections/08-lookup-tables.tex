@@ -1,0 +1,97 @@
+\section{The lookup tables}
+\label{sec:tables}
+
+The known algorithms live in JSON, one file per stage, inside the package:
+
+\begin{center}
+\begin{tabular}{@{}llr@{}l@{}}
+\toprule
+File & Stage & Cases & Labels \\
+\midrule
+\texttt{data/oll.json} & orientation of the last layer & 57 & \texttt{"1"} \ldots{} \texttt{"57"} \\
+\texttt{data/pll.json} & permutation of the last layer & 21 & \texttt{"Aa Perm"} \ldots{} \texttt{"Z Perm"} \\
+\texttt{data/f2l.json} & the four corner--edge pairs & 41 & \texttt{"1"} \ldots{} \texttt{"41"} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Schema}
+
+All three files share one shape:
+
+\begin{lstlisting}[style=data]
+{
+  "schema": 1,
+  "kind": "oll",
+  "cases": [
+    {
+      "label": "1",
+      "name": "No Edges - Runway",
+      "algorithm": "R U2' R2' F R F' U2 R' F R F'"
+    }
+  ]
+}
+\end{lstlisting}
+
+\begin{description}[leftmargin=0em,style=nextline]
+  \item[\texttt{schema}] the format version, so a future change can be detected
+  rather than misread;
+  \item[\texttt{kind}] \texttt{oll}, \texttt{pll} or \texttt{f2l}, which tells the
+  loader which recogniser to build;
+  \item[\texttt{label}] what the user sees in the solution listing --- the OLL
+  number, the PLL name, or the F2L case number;
+  \item[\texttt{name}] a longer description, shown by interfaces and in the JSON
+  metadata;
+  \item[\texttt{algorithm}] one algorithm in WCA notation.
+\end{description}
+
+\subsection{Where the algorithms come from}
+
+The tables are generated, not typed by hand, from the published \emph{Logiqx
+cubing-algs} collection, whose case identifiers match the community numbering:
+
+\begin{lstlisting}[style=shell]
+uv run python tools/build_last_layer_tables.py oll.js pll.js f2l.js
+\end{lstlisting}
+
+For every case the tool considers all the algorithms listed for it, keeps the ones
+that parse, checks that each one really solves its own case, and prefers the
+shortest algorithm that uses face turns only.  Those preferences matter: a wide or
+slice move shifts the centres, so an algorithm that uses one would leave the cube
+in a different orientation than the net is drawn in.
+
+\subsection{Why recognition cannot drift}
+
+The loader derives each case's recognition key from its algorithm, by applying the
+inverse of the algorithm to a solved cube and reading the pattern of the result.  A
+consequence worth knowing: if you edit an \texttt{algorithm} and restart, both the
+solution and the recognition change together, and there is no second place to update.
+
+Two cases whose patterns collide are a hard error --- the loader raises
+\texttt{InvalidStateError} naming both labels --- because a state with two possible
+algorithms is ambiguous.
+
+\subsection{Adding or changing a case}
+
+\begin{enumerate}[leftmargin=1.4em]
+  \item edit the JSON file: add an entry with a fresh label, a name and an algorithm;
+  \item run the tests.  The per-case test applies every algorithm to its own case
+  state and requires the stage to reach its goal, so a wrong algorithm fails loudly;
+  \item run \texttt{scripts/check.sh} and commit.
+\end{enumerate}
+
+Tables are loaded once per process and cached, so a running program keeps the tables
+it started with --- restart to pick up an edit.
+
+\subsection{What the tables do not cover}
+
+Two gaps are worth stating plainly:
+
+\begin{itemize}[leftmargin=1.4em]
+  \item of the 41 published F2L cases, 35 survive the ``face turns only''
+  preference.  Nothing is lost: the other six, and every configuration the 41 cases
+  do not describe at all, are handled by the verified search.
+  \item the last layer can contain a state for which the stored algorithm does not
+  finish the cube.  The pipeline notices, finishes the remainder with the two-phase
+  solver and reports it honestly in the stage metadata.
+\end{itemize}

@@ -9,6 +9,17 @@ The engine is designed to be embedded: it performs no I/O, has no third-party
 runtime dependencies and returns structured, JSON-serializable results, so a GUI
 (or a web front-end) can drive it directly.
 
+## Manual
+
+A full user manual, written in LaTeX, lives in [`manual/`](manual/README.md): it
+covers installation, the command line reference, how to read the output, the
+notation, how each stage is solved, the JSON lookup tables and the Python API, plus
+an appendix setting out the plan for a graphical interface.
+
+```bash
+cd manual && latexmk -pdf main.tex
+```
+
 ## Requirements
 
 * Python **3.13** (managed by [uv](https://docs.astral.sh/uv/): `uv python install 3.13`)
@@ -121,9 +132,9 @@ well when piped into a file.
 ```python
 import rubiks_cfop as cube
 
-scramble = cube.generate_scramble(seed=42)          # WCA random-state scramble
-solution = cube.solve_cube(scramble.state)          # CFOP
-print(solution.to_dict())                           # JSON-ready payload
+scramble = cube.generate_scramble(seed=42)  # WCA random-state scramble
+solution = cube.solve_cube(scramble.state)  # CFOP
+print(solution.to_dict())  # JSON-ready payload
 for stage in solution.stages:
     print(stage.label, stage.text)
 

@@ -64,6 +64,13 @@ from rubiks_cfop.scramble import (
     generate_scrambles,
 )
 from rubiks_cfop.solver import SearchLimits, preload, solve
+from rubiks_cfop.solver.cfop import (
+    CrossOption,
+    Solution,
+    Stage,
+    cross_options,
+    solve_cube,
+)
 
 __version__ = "0.1.0"
 
@@ -74,6 +81,7 @@ __all__ = [
     "CancelToken",
     "CancelledError",
     "Color",
+    "CrossOption",
     "Cube",
     "CubieCube",
     "Face",
@@ -88,9 +96,12 @@ __all__ = [
     "ScrambleStyle",
     "SearchLimitError",
     "SearchLimits",
+    "Solution",
     "SolveTimeoutError",
+    "Stage",
     "UnsolvableStateError",
     "__version__",
+    "cross_options",
     "format_moves",
     "generate_scramble",
     "generate_scrambles",
@@ -106,5 +117,6 @@ __all__ = [
     "render_emoji",
     "render_letters",
     "solve",
+    "solve_cube",
     "validate_facelets",
 ]

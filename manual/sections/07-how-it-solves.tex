@@ -1,0 +1,141 @@
+\section{How it solves}
+\label{sec:solver}
+
+CFOP is four stages.  Each one is a separate module, each returns structured data,
+and the pipeline verifies the whole solution before handing it back.
+
+\subsection{The cross}
+
+The four bottom edges are solved \emph{optimally}.  Only three things matter about
+a cross: which four of the twelve edge positions the bottom edges occupy, which of
+the four pieces is in which position, and how each is oriented.  That gives
+\[
+  \binom{12}{4} \cdot 4! \cdot 2^4 = 495 \cdot 24 \cdot 16 = 190{,}080
+\]
+states.  A breadth-first search over that space yields a distance table of one byte
+per state, about a megabyte, and a solution is read off by walking downhill one move
+at a time.  The table takes under a second to build, once per process.
+
+No cross needs more than eight moves, and because the table stores exact distances,
+the reported cross is as short as it possibly can be.  \texttt{--cross best} simply
+repeats the search for all six colours and keeps the shortest.
+
+\subsection{The first two layers}
+
+The four corner--edge pairs are inserted one at a time, in the order front-right,
+front-left, back-left, back-right, each insertion keeping the cross and every pair
+already inserted.
+
+Two mechanisms cooperate:
+
+\begin{description}[leftmargin=0em,style=nextline]
+  \item[The 41 case table] \texttt{data/f2l.json} holds the standard cases, each
+  expressed in the front-right frame.  A slot is recognised by the position and
+  orientation of its two pieces, and an algorithm is applied --- conjugated by a
+  whole-cube turn when the slot is not the front-right one, so the display stays
+  cross-down.
+  \item[The verified search] Anything the table does not cover --- which includes
+  any configuration where one of the pieces is stuck in another slot --- is inserted
+  by an iterative deepening search over the cube, guided by three admissible
+  heuristics: the distance to insert the pair, the distance to restore the cross and
+  the distance to restore each pair already inserted.  The search only stops at a
+  state where all of them are solved, so it cannot break an earlier stage.
+\end{description}
+
+A table result is always checked against the same goal before it is accepted; if it
+would disturb something, the search takes over.  The pair subproblem itself is
+small --- eight corner positions times three orientations times twelve edge
+positions times two orientations, 576 states --- which is what makes the heuristic
+cheap to evaluate at every node.
+
+\subsection{Orientation and permutation of the last layer}
+
+OLL and PLL are lookup tables of 57 and 21 cases.  Recognition does not use
+hand-written pattern descriptions, which are easy to get subtly wrong.  Instead the
+pattern of a case is \emph{computed from the case}: for each algorithm the engine
+applies its inverse to a solved cube, reads off the pattern of the resulting state,
+and stores that as the recognition key.  Table and recogniser therefore cannot
+drift apart.
+
+A case is only defined up to an adjustment of the top face, so every case is stored
+for all sixteen combinations of a turn \emph{before} the algorithm and a turn
+\emph{after} it --- the two-sided AUF of the cubing literature.  That is what makes
+the tables complete.  The test suite proves it by enumerating the whole last layer:
+
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+Space & Size & Verified \\
+\midrule
+Orientation states (OLL) & $3^3 \cdot 2^3 = 216$ & every state recognised and oriented \\
+Permutation states (PLL) & $4! \cdot 4! / 2 = 288$ & every state recognised and permuted \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The 216 and 288 include the already-solved configuration, which needs no algorithm:
+the pipeline reports \texttt{OLL (skip)} or \texttt{PLL (skip)} instead.
+
+\subsection{Scrambles: a two-phase solver}
+
+Random-state scrambles need a solver that can handle any state quickly, so the
+project includes a Kociemba-style \emph{two-phase} solver.  Six coordinates describe
+the cube compactly:
+
+\begin{center}
+\begin{tabular}{@{}llr@{}}
+\toprule
+Coordinate & Meaning & Values \\
+\midrule
+twist        & orientation of the eight corners & $3^7 = 2187$ \\
+flip         & orientation of the twelve edges & $2^{11} = 2048$ \\
+slice        & which positions hold the four slice edges & $\binom{12}{4} = 495$ \\
+corner perm  & permutation of the corners & $8! = 40{,}320$ \\
+edge perm    & permutation of the eight up/down edges & $8! = 40{,}320$ \\
+slice perm   & permutation of the four slice edges & $4! = 24$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Phase~1 brings twist, flip and slice home using all eighteen face turns; phase~2
+solves the rest using only half turns of R, L, F, B and any turn of U and D, which
+cannot disturb what phase~1 fixed.  Both phases are iterative deepening searches
+guided by breadth-first pruning tables (the worst phase-1 distances are 9, 9, 14
+and 12).  A solve takes about 20 to 22 moves and, once the tables are built, a
+fraction of a second.
+
+To produce a scramble the generator draws a uniformly random solvable state, solves
+it, and returns the \emph{inverse} of that solution --- so applying the scramble to a
+solved cube really does produce the drawn state.  States that would need fewer than
+two moves are redrawn, as Regulation 4b3 requires.
+
+\subsection{Every solution is verified}
+
+The pipeline concatenates the stages and applies the result to the scramble.  If the
+cube is not solved, it raises an error rather than returning the solution: a
+solution that does not check out is a bug, not a result.  The same flag is exposed as
+\texttt{verified} in the JSON payload.
+
+\subsection{Measured performance}
+
+Figures from the development machine, for a random-state scramble of 20 to 22 moves:
+
+\begin{center}
+\begin{tabular}{@{}lr@{}}
+\toprule
+Step & Typical cost \\
+\midrule
+Build the scrambler tables (first use only) & 10 s \\
+Generate a random-state scramble & 0.1--0.5 s \\
+Cross, all six colours & under 1 ms \\
+Four F2L pairs & 0.5--4 s (search-bound; see below) \\
+OLL and PLL & under 5 ms \\
+Whole solve & 0.7--4 s, 54 to 62 moves \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The F2L search dominates.  It is only used for configurations the 41-case table does
+not cover, and it is correct for every one of them; a complete pair table would make
+it unnecessary.  This is the single largest performance improvement available and is
+listed again in Section~\ref{sec:trouble}.

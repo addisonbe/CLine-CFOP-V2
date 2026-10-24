@@ -141,12 +141,12 @@ def build(kind: str, source: Path, destination: Path, *, labelled: bool) -> int:
 
 def main(argv: list[str]) -> int:
     """Build both tables from the paths given on the command line."""
-    if len(argv) < 3:  # noqa: PLR2004 - two paths are required
+    if len(argv) < 3:
         print(__doc__)
         return 2
     build("oll", Path(argv[1]), OUTPUT_DIR / "oll.json", labelled=False)
     build("pll", Path(argv[2]), OUTPUT_DIR / "pll.json", labelled=True)
-    if len(argv) > 3:  # noqa: PLR2004
+    if len(argv) > 3:
         build_f2l(Path(argv[3]), OUTPUT_DIR / "f2l.json")
     return 0
 

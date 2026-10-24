@@ -1,0 +1,70 @@
+\section{Introduction}
+\label{sec:intro}
+
+\subsection{What the program does}
+
+\texttt{rubiks-cfop} does two things:
+
+\begin{enumerate}[leftmargin=1.4em]
+  \item it \textbf{generates} scrambles for the $3\times3\times3$ cube in the form
+        the World Cube Association uses, and
+  \item it \textbf{solves} a cube with \textbf{CFOP}: \emph{Cross}, \emph{F2L}
+        (the first two layers, four corner--edge pairs), \emph{OLL} (orientation of
+        the last layer) and \emph{PLL} (permutation of the last layer).
+\end{enumerate}
+
+The program is two layers thick.  A \emph{headless engine} does all of the work and
+returns structured data: it never prints, never reads the environment and has no
+third-party runtime dependencies.  A thin \emph{command line interface} turns
+arguments into engine calls and data into text.  A graphical interface can be
+added later without touching the engine, which is the subject of
+Appendix~\ref{app:gui}.
+
+\subsection{Conventions}
+
+\begin{description}[leftmargin=0em,style=nextline]
+  \item[Cube representation] Kociemba's facelet notation: 54 facelets ordered
+  \texttt{U1..U9}, \texttt{R1..R9}, \texttt{F1..F9}, \texttt{D1..D9},
+  \texttt{L1..L9}, \texttt{B1..B9}.  The solved cube is the string
+  \texttt{UUUUUUUUURRRRRRRRRFFFFFFFFFDDDDDDDDDLLLLLLLLLBBBBBBBBB}.
+  \item[Moves] WCA notation (Regulation 12a): the face turns
+  \texttt{U D L R F B}, the wide turns \texttt{Uw Dw Lw Rw Fw Bw}, the rotations
+  \texttt{x y z}, and --- as a documented extension --- the slice turns
+  \texttt{M E S}.  Every move accepts the suffixes \texttt{2} and \texttt{'}.
+  \item[Colours] the standard scheme of Regulation 4d1, white on top and green in
+  front: \texttt{U} white, \texttt{R} red, \texttt{F} green, \texttt{D} yellow,
+  \texttt{L} orange, \texttt{B} blue.
+  \item[Cross] always solved into the \textbf{bottom layer}.  For a white cross the
+  upper layer is yellow, and the cube is reoriented so that this is what you see.
+\end{description}
+
+\subsection{WCA compliance}
+
+The scramble generator follows Regulation 4b3, which asks an official scramble
+program to ``produce a random state from all states that require at least 2 moves
+to solve (equal probability for each state)''.  For the $3\times3\times3$ cube that
+means \emph{random-state} scrambles: a uniformly random cube state is drawn and then
+solved, and the inverse of that solution is the scramble.  Random-move sequences ---
+fast, filtered, and what many tools mean by ``a scramble'' --- are also available,
+but they are not WCA-legal for this puzzle (Regulation 4b3e permits them only for
+$5\times5\times5$ and larger).  Scrambling orientation follows Regulation 4d1.
+
+\subsection{Where the algorithms come from}
+
+The OLL (57 cases) and PLL (21 cases) and F2L (41 cases) algorithms in the JSON
+tables were taken from the published \emph{Logiqx cubing-algs} collection, whose
+case identifiers match the community numbering.  They are not trusted on the
+engineer's word: every entry is \emph{verified by execution}, and the recogniser's
+patterns are \emph{derived from the algorithms themselves}, so the table and the
+recognition can never disagree.  Section~\ref{sec:tables} describes the mechanism.
+
+\subsection{How this manual is organised}
+
+Section~\ref{sec:install} installs the program, Section~\ref{sec:quickstart} shows
+it working, Section~\ref{sec:cli} is the complete command line reference and
+Section~\ref{sec:output} explains the output line by line.
+Section~\ref{sec:notation} is a notation primer, Section~\ref{sec:solver} explains
+how each stage is solved, Section~\ref{sec:tables} documents the JSON tables and
+Section~\ref{sec:library} the Python API.  Section~\ref{sec:trouble} covers
+troubleshooting and the known limitations, and Appendix~\ref{app:gui} plans the
+graphical interface.

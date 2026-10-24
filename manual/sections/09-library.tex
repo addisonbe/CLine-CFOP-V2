@@ -1,0 +1,164 @@
+\section{Using the engine from Python}
+\label{sec:library}
+
+The engine is a library first and a program second.  Everything the command line
+does is available as a function, and everything it prints is available as data.
+
+\subsection{The public surface}
+
+\begin{longtable}{@{}p{4.6cm}p{9.8cm}@{}}
+\toprule
+Name & Purpose \\
+\midrule
+\endhead
+\texttt{Cube} & an immutable cube state: \texttt{apply}, \texttt{apply\_moves},
+\texttt{apply\_sequence}, \texttt{apply\_scramble}, \texttt{is\_solved},
+\texttt{is\_solvable}, \texttt{cubie}, \texttt{to\_dict} \\
+\texttt{CubieCube} & the same cube at the piece level: corner and edge permutations
+with orientations, plus \texttt{validate} \\
+\texttt{MOVES}, \texttt{get\_move}, \texttt{invert} & the 54 canonical moves and
+their inverses \\
+\texttt{parse\_moves}, \texttt{parse\_scramble}, \texttt{format\_moves},
+\texttt{normalize\_sequence} & notation in and out \\
+\texttt{generate\_scramble}, \texttt{generate\_scrambles} & scrambles, with a seed
+and a style \\
+\texttt{Scramble} & the movement list, its text, the state it produces, its seed \\
+\texttt{solve\_cube} & the CFOP pipeline: the whole solution as a \texttt{Solution} \\
+\texttt{cross\_options} & the six cross colours with their lengths, ranked \\
+\texttt{Solution}, \texttt{Stage}, \texttt{CrossOption} & the result objects, each
+with \texttt{to\_dict} \\
+\texttt{solve}, \texttt{SearchLimits} & the two-phase solver on its own, with depth
+and time limits \\
+\texttt{CancelToken} & cooperative cancellation for a solve \\
+\texttt{preload} & build the scrambler tables now \\
+\texttt{net\_layout}, \texttt{render\_ansi}, \texttt{render\_emoji},
+\texttt{render\_letters}, \texttt{NetLayout}, \texttt{DEFAULT\_PALETTE} & the
+unfolded net, as data or as text \\
+\texttt{RubiksError} and subclasses & structured errors, each with
+\texttt{to\_dict} \\
+\bottomrule
+\end{longtable}
+
+\subsection{Scramble and solve}
+
+\begin{lstlisting}[style=python]
+import rubiks_cfop as cube
+
+scramble = cube.generate_scramble(seed=42)
+print(scramble.text)                 # "D B2 F2 ..."
+print(scramble.style.value)          # "random-state"
+print(scramble.state.is_solvable())  # True
+
+solution = cube.solve_cube(scramble.state, scramble=scramble.text)
+for stage in solution.stages:
+    print(f"{stage.label}: {stage.text}")
+print(solution.total_moves, solution.verified)
+\end{lstlisting}
+
+\begin{lstlisting}[style=shell]
+Cross: z z R' F D' F2 R' F
+F2L1: U2 B' R2 B R2
+F2L2: F' L F L2 U' L
+F2L3: U L U' B U B' L'
+F2L4: U B U B' U2 R' U2 R
+OLL (40): U R' F R U R' U' F' U R
+PLL (F Perm): U' L R2 U R U R2 U' R' U' R2 U' R U2 L' U R' U2
+62 True
+\end{lstlisting}
+
+\subsection{Choosing the cross}
+
+\begin{lstlisting}[style=python]
+solution = cube.solve_cube(cube.Cube.solved().apply_scramble("R U R' U'"), cross="white")
+
+for option in cube.cross_options(scramble.state):
+    print(option.color.value, option.length)
+\end{lstlisting}
+
+The colour may be a \texttt{Color} or its name; \texttt{"best"} is the default.
+
+\subsection{Drawing the cube}
+
+\begin{lstlisting}[style=python]
+layout = cube.net_layout(scramble.state)   # 9 rows x 12 columns of Color
+print(cube.render_emoji(layout))           # for a terminal without colour
+print(cube.render_ansi(layout))            # 24-bit ANSI background colours
+
+for face, rows in layout.to_dict()["faces"].items():
+    print(face, rows[0])                   # the top row of each face, by name
+\end{lstlisting}
+
+\texttt{NetLayout} holds colours, not escape codes: an interface draws the cube in
+its own way from the same structure.  \texttt{render\_letters} exists for logs and
+diffs, and is deliberately not the default, because the program's output is meant to
+show real colours.
+
+\subsection{Cancelling a solve}
+
+A solve can take a few seconds, and an interactive program must be able to abandon
+one.
+
+\begin{lstlisting}[style=python]
+import threading
+import rubiks_cfop as cube
+
+cancel = cube.CancelToken()
+
+def work():
+    try:
+        solution = cube.solve_cube(scramble.state)
+    except cube.CancelledError:
+        print("abandoned")
+
+thread = threading.Thread(target=work)
+thread.start()
+# ... later, from the user interface thread:
+cancel.cancel()
+\end{lstlisting}
+
+Passing a token to a solve is a matter of scheduling: the pipeline checks it at
+regular intervals and raises \texttt{CancelledError} promptly.  The two-phase solver
+accepts the same token and an optional timeout through \texttt{SearchLimits}.
+
+\subsection{Errors}
+
+Every error derives from \texttt{RubiksError} and carries a stable \texttt{code}, a
+message and structured details, so a caller never has to parse a string:
+
+\begin{center}
+\begin{tabular}{@{}ll@{} }
+\toprule
+Class & When \\
+\midrule
+\texttt{NotationError} & a move sequence that cannot be parsed, with
+\texttt{token} and \texttt{index} \\
+\texttt{InvalidMoveError} & a single move that is not valid on a $3\times3\times3$ \\
+\texttt{InvalidStateError} & a malformed state: wrong length, wrong counts, moved
+centres, a piece that cannot exist \\
+\texttt{UnsolvableStateError} & a well formed but impossible state: a twisted
+corner, a flipped edge, wrong parity \\
+\texttt{SearchLimitError} & a search ran out of depth budget \\
+\texttt{SolveTimeoutError} & a solve ran out of time \\
+\texttt{CancelledError} & a solve was cancelled \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{lstlisting}[style=python]
+try:
+    cube.Cube.solved().apply_sequence("R Q")
+except cube.NotationError as error:
+    print(error.to_dict())
+    # {'code': 'notation-error', 'message': 'not WCA move notation',
+    #  'details': {'index': 1, 'token': 'Q'}}
+\end{lstlisting}
+
+\subsection{Threading and immutability}
+
+\texttt{Cube}, \texttt{CubieCube}, \texttt{Move}, \texttt{Solution} and
+\texttt{Stage} are frozen value objects: sharing one between threads is safe, and
+applying a move returns a new cube rather than changing one.  Solved data is never
+mutated, the caches are read-only tables, and the solvers keep their state in local
+variables, so a program may solve on a worker thread while its interface keeps
+running.  The only expensive one-off work --- the scrambler tables --- is exposed as
+\texttt{preload()} precisely so that it can be moved off the interactive path.

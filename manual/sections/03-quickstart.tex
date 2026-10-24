@@ -1,0 +1,96 @@
+\section{Quick start}
+\label{sec:quickstart}
+
+\subsection{Solve a scramble you were given}
+
+\begin{lstlisting}[style=shell]
+uv run rubiks-cfop --scramble "R U R' U' F2 D"
+\end{lstlisting}
+
+The program prints the scrambled cube as an unfolded net in real colours, then the
+solution stage by stage.  Piped into a file, or with \texttt{--no-color}, the net is
+drawn with coloured squares instead of terminal colours.  A run looks like this:
+
+\begin{lstlisting}[style=shell]
+      ####
+      ####          <- U face (yellow when the cross is white)
+      ####
+##########  ...
+##########  ...     <- L, F, R and B in a band
+##########  ...
+      ####
+      ####          <- D face (the cross colour)
+      ####
+
+Orientation: none
+Cross colour: yellow (bottom layer)
+Scramble: R U R' U' F2 D
+
+Cross: D' F2
+F2L1: R' F R F'
+F2L2: (none)
+F2L3: (none)
+F2L4: (none)
+OLL (37): F R' F' R U R U' R'
+PLL (skip): (none)
+
+Total: 14 moves
+\end{lstlisting}
+
+(The \texttt{\#} characters stand for coloured cells; Section~\ref{sec:output}
+shows the real thing.)
+
+\subsection{Generate a scramble and solve it}
+
+\begin{lstlisting}[style=shell]
+uv run rubiks-cfop --random --seed 42
+\end{lstlisting}
+
+\texttt{--random} is the default when no scramble is given.  The scramble is a
+random-state scramble (WCA 4b3), typically 20 to 22 moves, and \texttt{--seed}
+makes it reproducible: the same seed always yields the same scramble.
+
+\begin{lstlisting}[style=shell]
+Orientation: zz
+Cross colour: white (bottom layer)
+Scramble: D B2 F2 L2 U' F2 U B2 R2 U L2 F R' U' B' U L R F D B
+
+Cross: z z R' F D' F2 R' F
+F2L1: U2 B' R2 B R2
+F2L2: F' L F L2 U' L
+F2L3: U L U' B U B' L'
+F2L4: U B U B' U2 R' U2 R
+OLL (40): U R' F R U R' U' F' U R
+PLL (F Perm): U' L R2 U R U R2 U' R' U' R2 U' R U2 L' U R' U2
+
+Total: 62 moves
+\end{lstlisting}
+
+\subsection{Pick the cross yourself}
+
+\begin{lstlisting}[style=shell]
+uv run rubiks-cfop --scramble "R U R' U'" --cross white
+uv run rubiks-cfop --scramble "R U R' U'" --cross-options
+\end{lstlisting}
+
+\texttt{--cross} names one of the six colours; \texttt{--cross-options} first lists
+what each of the six crosses would cost, shortest first:
+
+\begin{lstlisting}[style=shell]
+  yellow  0 moves
+  white   3 moves
+  green   4 moves
+  ...
+\end{lstlisting}
+
+\subsection{Get the result as JSON}
+
+\begin{lstlisting}[style=shell]
+uv run rubiks-cfop --scramble "R U R' U'" --json
+\end{lstlisting}
+
+The payload carries the scramble, the cross colour, the rotation applied, every
+stage with its moves and the facelets \emph{after} the stage, the metrics and a
+verification flag.  It is the same structure the Python API returns from
+\texttt{Solution.to\_dict()}, so a GUI or a web front-end can consume it directly;
+Section~\ref{sec:library} documents it.

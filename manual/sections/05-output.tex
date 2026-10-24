@@ -1,0 +1,135 @@
+\section{Reading the output}
+\label{sec:output}
+
+\subsection{The unfolded cube}
+
+The first thing printed is the scrambled cube, unfolded into the usual cross shape:
+the front face in the middle, the upper face above it, the bottom face below it and
+the left, front, right and back faces across a band.
+
+\begin{figure}[htbp]
+\centering
+\netfig{figures/net-solved}
+\caption{The solved cube.  Top to bottom: U, then the band L--F--R--B, then D.}
+\label{fig:net-solved}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\netfig{figures/net-scrambled}
+\caption{The cube after the scramble \texttt{R U R' U' F2}.  Each square is one
+facelet; Section~\ref{sec:notation} gives the facelet numbering.}
+\label{fig:net-scrambled}
+\end{figure}
+
+The cells are drawn in the cube's real colours --- no letters describe a colour, so
+the picture can be checked at a glance against the physical cube.
+
+\begin{center}
+\begin{tabular}{@{}llll@{}}
+\toprule
+Face & Colour & RGB & Position in the net \\
+\midrule
+\texttt{U} & white  & \texttt{\#FFFFFF} & above the band \\
+\texttt{L} & orange & \texttt{\#FF5800} & band, first group \\
+\texttt{F} & green  & \texttt{\#009E60} & band, second group \\
+\texttt{R} & red    & \texttt{\#C41E3A} & band, third group \\
+\texttt{B} & blue   & \texttt{\#0051BA} & band, fourth group \\
+\texttt{D} & yellow & \texttt{\#FFD500} & below the band \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{The orientation lines}
+
+\begin{lstlisting}[style=shell]
+Orientation: zz
+Cross colour: white (bottom layer)
+\end{lstlisting}
+
+The cross is always solved into the bottom layer, so the cube you are shown is
+usually \emph{not} in the orientation it was scrambled in.  \texttt{Orientation}
+records the whole-cube rotation that was applied to put the chosen colour at the
+bottom (\texttt{none} when no rotation was needed).  For a white cross the top face
+is therefore yellow, as the second line states.
+
+Both lines describe the same picture: compare the bottom face of the net with the
+\texttt{Cross colour} line, and the top face with its opposite.
+
+\subsection{The stages}
+
+\begin{lstlisting}[style=shell]
+Cross: D' F2
+F2L1: R' F R F'
+F2L2: (none)
+F2L3: (none)
+F2L4: (none)
+OLL (37): F R' F' R U R U' R'
+PLL (skip): (none)
+
+Total: 14 moves
+\end{lstlisting}
+
+\begin{description}[leftmargin=0em,style=nextline]
+  \item[\texttt{Cross}] the moves that solve the four bottom edges.  Optimal: no
+  cross needs more than eight moves, and this one is as short as possible for the
+  chosen colour.
+  \item[\texttt{F2L1} to \texttt{F2L4}] one line per inserted pair, in the order
+  front-right, front-left, back-left, back-right.  Each line keeps the cross and
+  every earlier pair solved.
+  \item[\texttt{OLL (\textit{n})}] the orientation of the last layer, with the
+  number of the case in the standard 1--57 numbering.  When the last layer is
+  already oriented the line reads \texttt{OLL (skip)} and has no moves.
+  \item[\texttt{PLL (\textit{name})}] the permutation of the last layer, with the
+  name of the case (\texttt{T Perm}, \texttt{Ua Perm}, \ldots).  When the last layer
+  is already permuted the line reads \texttt{PLL (skip)}.
+  \item[\texttt{(none)}] a stage that needed no moves.
+  \item[\texttt{Total}] the number of moves in the whole solution.
+\end{description}
+
+A stage's move list occasionally contains a rotation (\texttt{x}, \texttt{y} or
+\texttt{z}) and wide or slice moves: some published algorithms use them, and the
+rotations keep the cube in the ``cross down'' orientation the net is drawn in.
+
+\subsection{Applying the solution}
+
+Read the stages top to bottom and apply the moves in the order printed to the cube
+in the orientation of the net --- the cross colour at the bottom.  The line
+\texttt{Orientation} tells you how the cube was turned to get there, so you can
+reproduce that orientation on a physical cube.  Every move is standard WCA notation
+(Section~\ref{sec:notation}).
+
+A quick check that you are reading it right: after \texttt{Cross}, the four bottom
+edges and their side centres must form a plus sign, and the bottom face must be
+entirely the cross colour.
+
+\subsection{The JSON payload}
+
+\begin{lstlisting}[style=data]
+{
+  "scramble": "R U R' U'",
+  "cross_color": "yellow",
+  "rotation": "",
+  "stages": [
+    {
+      "label": "Cross", "kind": "cross", "moves": [], "text": "", "length": 0,
+      "facelets": "UULUUFUUFRRUBRRURRFFDFFUFFFDDRDDDDDDBLLLLLLLLBRRBBBBBB",
+      "metadata": {"color": "yellow", "rotation": ""}
+    },
+    {
+      "label": "F2L1", "kind": "f2l", "moves": ["R'", "F", "R", "F'"],
+      "text": "R' F R F'", "length": 4,
+      "facelets": "UUFUUFBBURUURRRRRRUUFFFFFFFDDDDDDDDDBLLLLLLLLLRRBBBBBB",
+      "metadata": {"slot": "FR", "case": "1", "case_name": "Same Colour on Top"}
+    },
+    ...
+  ],
+  "total_moves": 12,
+  "verified": true,
+  "final_facelets": "UUUUUUUUURRRRRRRRRFFFFFFFFFDDDDDDDDDLLLLLLLLLBBBBBBBBB"
+}
+\end{lstlisting}
+
+\texttt{facelets} on each stage is the state \emph{after} that stage, so a user
+interface can show or animate any stage without re-running the solver, and
+\texttt{verified} is the result of re-applying the whole solution to the scramble.

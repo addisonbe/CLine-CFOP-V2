@@ -1,0 +1,124 @@
+\documentclass[11pt,a4paper]{article}
+
+% ---------------------------------------------------------------------------
+% Packages
+% ---------------------------------------------------------------------------
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage[margin=2.4cm,headheight=14pt]{geometry}
+\usepackage[table]{xcolor}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{listings}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage[hidelinks,bookmarksnumbered]{hyperref}
+
+% ---------------------------------------------------------------------------
+% The cube palette (identical to DEFAULT_PALETTE in the engine)
+% ---------------------------------------------------------------------------
+\definecolor{white}{RGB}{255,255,255}
+\definecolor{red}{RGB}{196,30,58}
+\definecolor{green}{RGB}{0,158,96}
+\definecolor{yellow}{RGB}{255,213,0}
+\definecolor{orange}{RGB}{255,88,0}
+\definecolor{blue}{RGB}{0,81,186}
+\definecolor{codebg}{RGB}{247,247,247}
+\definecolor{rulegrey}{RGB}{170,170,170}
+
+% One cell of a cube net: a coloured square, or a blank of the same size.
+\newcommand{\cubecell}[1]{\cellcolor{#1}\rule{4.6mm}{4.6mm}}
+\newcommand{\cubeblank}{\phantom{\rule{4.6mm}{4.6mm}}}
+\newcommand{\netfig}[1]{%
+  \setlength{\arrayrulewidth}{0.3pt}%
+  \renewcommand{\arraystretch}{0}%
+  \begin{tabular}{@{}*{12}{c}@{}}\input{#1}\end{tabular}}
+
+% ---------------------------------------------------------------------------
+% Listings
+% ---------------------------------------------------------------------------
+\lstdefinestyle{shell}{
+  basicstyle=\ttfamily\small,
+  backgroundcolor=\color{codebg},
+  frame=single,
+  rulecolor=\color{rulegrey},
+  columns=fullflexible,
+  keepspaces=true,
+  breaklines=true,
+  postbreak=\mbox{\textcolor{rulegrey}{$\hookrightarrow$}\space},
+  showstringspaces=false,
+  aboveskip=0.8em,
+  belowskip=0.8em
+}
+\lstdefinestyle{python}{
+  style=shell,
+  language=Python,
+  keywordstyle=\bfseries,
+  commentstyle=\itshape\color{black!55},
+  morekeywords={as,with,match,case}
+}
+\lstdefinestyle{data}{
+  style=shell,
+  morestring=[b]"
+}
+\lstset{style=shell}
+
+% ---------------------------------------------------------------------------
+% Page style
+% ---------------------------------------------------------------------------
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small rubiks-cfop}
+\fancyhead[R]{\small\thepage}
+\renewcommand{\headrulewidth}{0.3pt}
+
+\titleformat{\section}{\normalfont\Large\bfseries}{\thesection}{0.7em}{}
+\titleformat{\subsection}{\normalfont\large\bfseries}{\thesubsection}{0.6em}{}
+
+% ---------------------------------------------------------------------------
+% Document
+% ---------------------------------------------------------------------------
+\title{\textbf{rubiks-cfop}\\[0.3em]
+  \large A user manual for the WCA scramble generator and CFOP solver}
+\author{The rubiks-cfop project}
+\date{Version 0.1.0}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+\noindent
+\texttt{rubiks-cfop} is a headless engine, and a small command line program built
+on it, that generates WCA scrambles for the $3\times3\times3$ Rubik's Cube and
+solves them with the CFOP method.  The cube is represented with Kociemba's facelet
+notation, every standard and wide move is implemented, and the known algorithms
+live in JSON lookup tables.  This manual explains how to install and use the
+program, how to read its output, how the solver works, and how to drive the engine
+from Python.  Appendix~\ref{app:gui} sets out a plan for the graphical interface
+that will be built on the same engine.
+\end{abstract}
+
+\tableofcontents
+\clearpage
+
+\input{sections/01-introduction}
+\input{sections/02-installation}
+\input{sections/03-quickstart}
+\input{sections/04-command-line}
+\input{sections/05-output}
+\input{sections/06-notation}
+\input{sections/07-how-it-solves}
+\input{sections/08-lookup-tables}
+\input{sections/09-library}
+\input{sections/10-troubleshooting}
+
+\appendix
+\input{appendix/gui-plan}
+
+\end{document}

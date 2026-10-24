@@ -120,7 +120,8 @@ ignore = [
     "T20",     # tests print diagnostics
     "TRY003",  # long messages inline are fine in tests
 ]
-"tools/**/*.py" = ["T201", "ANN", "D"]
+"tools/**/*.py" = ["T201", "ANN", "D", "INP001", "PERF401", "C901", "PLR0912", "PLR2004"]
+"manual/tools/**/*.py" = ["T201", "ANN", "D", "INP001", "PERF401", "C901", "PLR0912", "PLR2004"]
 
 [tool.ruff.lint.mccabe]
 max-complexity = 12

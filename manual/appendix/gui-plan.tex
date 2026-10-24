@@ -1,0 +1,287 @@
+\section{A plan for the graphical interface}
+\label{app:gui}
+
+This appendix plans the desktop interface that will sit on top of the engine.  It is
+a plan, not a description of shipped code: nothing here exists yet.  The engine was
+built headless precisely so that this work could be added without rewriting it, and
+the plan below leans on what is already there.
+
+\subsection{Goals and non-goals}
+
+\textbf{Goals.}
+
+\begin{enumerate}[leftmargin=1.4em]
+  \item Show the scrambled cube as a clear, coloured net, and let the user read a
+  solution stage by stage.
+  \item Accept a scramble typed by the user, a facelet string from another tool, or
+  a generated scramble with a reproducible seed.
+  \item Let the user choose the cross colour, or let the program choose the best one
+  and say what it chose.
+  \item Animate a solution move by move, with play, pause, step and a stage scrubber.
+  \item Stay responsive: never block the window while solving, and always allow the
+  solve to be cancelled.
+  \item Present errors as information, not as a crash: a bad token should be shown
+  at its position in the input.
+\end{enumerate}
+
+\textbf{Non-goals.}
+
+\begin{itemize}[leftmargin=1.4em]
+  \item A photorealistic 3D cube.  A 2D net is unambiguous, cheap to draw and much
+  easier to test; a 3D view is a later, optional renderer behind the same interface.
+  \item Competition features: no timer, no inspection countdown, no session
+  statistics, no scrambles from the network.
+  \item Other puzzles, and any change to the solving algorithm.
+\end{itemize}
+
+\subsection{What the engine already provides}
+
+Every one of these exists today and was designed for this purpose:
+
+\begin{longtable}{@{}p{4.8cm}p{9.4cm}@{}}
+\toprule
+Engine facility & What the interface does with it \\
+\midrule
+\endhead
+\texttt{Cube.apply\_scramble} & turns the typed scramble into a state, raising
+\texttt{NotationError} with the token and index to highlight \\
+\texttt{solve\_cube} & the whole CFOP solution, already verified, with the cross
+colour, the rotation applied and every stage \\
+\texttt{Solution.to\_dict} & the payload the interface renders: stage labels, move
+lists, and the facelets after each stage \\
+\texttt{Stage.metadata} & the OLL number, the PLL name, the F2L slot and case, for
+informative rows \\
+\texttt{cross\_options} & the six crosses with their lengths, for the picker \\
+\texttt{net\_layout} & a structured grid of colours; no escape codes to parse, and
+no dependency on the terminal \\
+\texttt{NetLayout.to\_dict} & the six faces as colour names, ready for a web view \\
+\texttt{DEFAULT\_PALETTE} & the standard colours, so the canvas matches the CLI \\
+\texttt{CancelToken} & cancelling a solve from the interface thread \\
+\texttt{preload} & building the scrambler tables at start-up, off the UI thread \\
+\texttt{RubiksError.to\_dict} & structured errors to display without parsing prose \\
+\bottomrule
+\end{longtable}
+
+\subsection{Small engine additions the interface needs}
+
+Four additions, all backwards compatible and all testable without a display:
+
+\begin{enumerate}[leftmargin=1.4em]
+  \item \texttt{iter\_move\_states(cube, moves)} --- an iterator over
+  \texttt{(move, state)} pairs, so the animation applies one move at a time instead
+  of owning a copy of the cube model.  Trivial to implement, and it keeps move
+  application in one place.
+  \item \texttt{Session} --- a stepwise solver: \texttt{next\_stage()} returns the
+  next \texttt{Stage}, with \texttt{state}, \texttt{done} and \texttt{progress}
+  properties.  A one-shot solve is then just a loop over it, so the interface can
+  show a stage as soon as it is ready.
+  \item \texttt{on\_stage} callback on the solve options, called from the solving
+  thread as each stage completes.  Documented as \emph{called from that thread}:
+  the interface posts to its own queue.
+  \item \texttt{schemas/solution.schema.json} and a \texttt{schema\_version} field in
+  the payload, plus a contract test that validates the emitted JSON against the
+  schema.  This is what lets a second front-end (the web one) rely on the format.
+\end{enumerate}
+
+None of these adds a dependency to the engine, and none changes an existing
+signature.
+
+\subsection{Architecture}
+
+The interface is split in three, and only the last layer knows about a toolkit:
+
+\begin{lstlisting}[style=data]
++-------------------------------------------------------------+
+|  app shell (main window, menu, shortcuts, settings dialog)  |
++-------------------------------------------------------------+
+|  views        ScrambleBar  CubeCanvas  SolutionTable        |
+|               Player       CrossPicker StatusBar            |
++-------------------------------------------------------------+
+|  view-model   AppState: cube, solution, selected stage,     |
+|               selected move, busy flag, last error          |
+|               pure functions, no toolkit, fully unit tested |
++-------------------------------------------------------------+
+|  engine       rubiks_cfop  (already headless, thread-safe)  |
++-------------------------------------------------------------+
+\end{lstlisting}
+
+Two rules make the plan work:
+
+\begin{enumerate}[leftmargin=1.4em]
+  \item \textbf{The view-model never imports a toolkit.}  It holds the state and the
+  transitions --- \emph{start a solve}, \emph{select a stage}, \emph{step a move},
+  \emph{report an error} --- and is tested with plain pytest.  Everything that is
+  easy to get wrong lives here, where it can be tested headlessly.
+  \item \textbf{The canvas draws through a painter interface.}  \texttt{CubeCanvas}
+  receives a \texttt{Painter} with \texttt{fill\_rect(x, y, w, h, colour)} and
+  \texttt{draw\_text(...)}.  Production uses the toolkit's painter, tests use a
+  recorder, so the layout can be asserted without a screen.
+\end{enumerate}
+
+\subsection{Choosing a toolkit}
+
+\begin{longtable}{@{}p{3cm}p{2.4cm}p{4.2cm}p{4.4cm}@{}}
+\toprule
+Option & Dependency & Strengths & Costs \\
+\midrule
+\endhead
+Tkinter & none (standard library) & matches the engine's zero-dependency stance;
+ships with Python; enough for a net, a table and a canvas & dated look; the
+\texttt{Canvas} widget is a little low level \\
+PySide6 / Qt & a large wheel & polished widgets, good high-DPI support, animation
+timers & a heavy dependency and a licence to respect; overkill for a net and a
+table \\
+Web front-end & a server plus a browser & the JSON payload already suits it;
+portable; easy to share & a second process, a second language, and no offline
+single-file story \\
+\bottomrule
+\end{longtable}
+
+\textbf{Recommendation:} Tkinter for the first interface.  It keeps the project
+installable with no optional dependency, and the view-model plus painter split means
+a Qt or web front-end can replace the view layer later without touching the
+reasoning.  A web front-end is the natural second step, and the JSON payload and its
+schema are the contract for it.
+
+\subsection{Screens and widgets}
+
+\begin{description}[leftmargin=0em,style=nextline]
+  \item[Scramble bar] one line of text in WCA notation, with a \emph{Random}
+  button, a seed field and a \emph{lock seed} toggle, a style selector
+  (random-state, or random-move with a warning that it is not WCA-legal), and a
+  \emph{Solve} button.  Invalid notation is marked at the offending token, taken
+  from \texttt{NotationError.index}.
+  \item[Cube canvas] the unfolded net, drawn from \texttt{net\_layout} in the chosen
+  palette.  It shows either the scramble or the state after the selected stage, and
+  it is the surface the animation draws on.
+  \item[Solution table] one row per stage: label, case (the OLL number, the PLL name,
+  the F2L slot), the moves, the length and the running total.  Selecting a row moves
+  the canvas to that stage's \texttt{facelets} and the player to that stage.
+  \item[Player] play, pause, step forward and back, a speed slider and a stage
+  scrubber.  Playing a stage animates its moves one at a time; stepping shows the
+  cube after a single move.
+  \item[Cross picker] the six colours with their move counts, best first, from
+  \texttt{cross\_options}; picking one re-solves with that cross and reports where
+  the cube was rotated.
+  \item[Status bar] the version, the time spent, the total move count and a
+  \emph{verified} badge that comes from the payload, plus a cancel button while a
+  solve runs.
+  \item[Settings] palette (standard or a high-contrast set), animation speed, font
+  size, and whether a generated scramble is remembered between sessions.
+\end{description}
+
+\subsection{Threading, responsiveness and cancellation}
+
+\begin{enumerate}[leftmargin=1.4em]
+  \item \textbf{Nothing expensive on the UI thread.}  A CFOP solve takes up to a few
+  seconds and building the scrambler tables takes about ten.  Both run on worker
+  threads.
+  \item \textbf{One solve at a time.}  Starting a second solve cancels the first;
+  the token makes that prompt and the \texttt{CancelledError} is reported as
+  \emph{cancelled}, not as a failure.
+  \item \textbf{Results cross threads as data.}  The worker hands back
+  \texttt{Solution.to\_dict()}; the UI thread rebuilds the view-model from it.  No
+  engine object is shared while it is being computed.
+  \item \textbf{Table preloading at start-up.}  A splash or a status message during
+  \texttt{preload()}, which then makes every later scramble immediate.
+  \item \textbf{Cooperative timers for animation.}  The player advances one move per
+  tick and stops when the window is not visible; the engine is only asked for the
+  next state, never for a whole animation.
+\end{enumerate}
+
+\subsection{Testing without a display}
+
+A graphical interface is usually the least tested part of a project.  The
+architecture above makes most of it testable anyway:
+
+\begin{longtable}{@{}p{4.6cm}p{9.4cm}@{}}
+\toprule
+Layer & How it is tested \\
+\midrule
+\endhead
+view-model & plain pytest: transitions, stage selection, move stepping, error
+reporting, busy and cancelled states \\
+canvas layout & a recording painter: the sequence of rectangles and colours must
+match \texttt{net\_layout} cell for cell \\
+payload contract & the schema file plus a test that validates
+\texttt{Solution.to\_dict()} and the CLI's \texttt{--json} against it \\
+engine & the existing suite; the interface adds no logic below the view-model \\
+interactive smoke test & a scripted session on a headless display where one is
+available, skipped otherwise, that types a scramble, solves, steps twice and
+asserts the canvas state \\
+\bottomrule
+\end{longtable}
+
+The rule of thumb: if a behaviour cannot be tested without a screen, it belongs in
+the view-model or below, not in the widget.
+
+\subsection{Milestones}
+
+Each milestone leaves the program in a usable state and ends with a green gate
+(formattingl, linting and the whole test suite).
+
+\begin{longtable}{@{}p{1.5cm}p{5.4cm}p{7.2cm}@{}}
+\toprule
+Step & Scope & Acceptance \\
+\midrule
+\endhead
+M0 & Skeleton: window, view-model, canvas with the painter interface, static net &
+\texttt{rubiks-cfop-gui --scramble "R U R' U'"} shows the net; view-model and canvas
+layout tests green; no change to the engine \\
+M1 & Scramble bar, solve button, solution table, verified badge & twenty random
+scrambles solved through the interface; the payload equals the CLI's
+\texttt{--json}; a bad token is reported at its index \\
+M2 & Player and animation & play, pause, step and speed animate a solution;
+stepping lands on the exact \texttt{facelets} of each stage \\
+M3 & Cross picker, seed field, preload splash & choosing a colour re-solves with
+it; the same seed reproduces the same scramble; no freeze during preload \\
+M4 & Cancellation, progress, structured error dialogs & cancel returns within a
+fraction of a second and leaves the window usable; every error class renders \\
+M5 & Settings, palette, packaging, documentation & a \texttt{[gui]} extra and a
+\texttt{rubiks-cfop-gui} entry point; screenshots in the manual; the suite is still
+green without a display \\
+\bottomrule
+\end{longtable}
+
+\subsection{Packaging}
+
+\begin{lstlisting}[style=shell]
+# optional dependency group, so the engine stays dependency free
+uv add --optional gui pytest-qt   # or nothing at all, for Tkinter
+
+# entry point
+rubiks-cfop-gui --scramble "R U R' U'" --cross white
+\end{lstlisting}
+
+With Tkinter the group is empty, which is the strongest argument for starting there:
+\texttt{pip install rubiks-cfop} gives a working command line, and
+\texttt{pip install 'rubiks-cfop[gui]'} gives the window.
+
+\subsection{Risks}
+
+\begin{longtable}{@{}p{5.4cm}p{8.8cm}@{}}
+\toprule
+Risk & Mitigation \\
+\midrule
+\endhead
+The toolkit choice turns out to be wrong & the view-model and the painter interface
+isolate it; a replacement touches only the view layer \\
+Slow solves make the interface feel broken & the two F2L improvements in
+Section~\ref{sec:trouble} are the real fix; meanwhile the progress callback and the
+cancel button keep it honest \\
+Animation looks choppy & redrawing 54 cells per frame is negligible; if needed,
+animate only the affected layer \\
+The engine API drifts while the interface is written & the payload schema and its
+contract test are the interface between them \\
+Nothing can be tested on the build machine & the canvas painter and the view-model
+need no display; the interactive test is skipped when there is no display \\
+\bottomrule
+\end{longtable}
+
+\subsection{Order of work}
+
+M0 and M1 are deliberately small: they prove the two risky assumptions --- that the
+canvas can be tested headlessly, and that a solve can be run off the UI thread
+without freezing --- before any polish.  If those hold, M2 to M5 are ordinary
+interface work, and the web front-end becomes a matter of writing a second view over
+the same payload.

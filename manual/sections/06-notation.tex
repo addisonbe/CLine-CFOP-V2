@@ -1,0 +1,112 @@
+\section{Notation}
+\label{sec:notation}
+
+\subsection{Face turns}
+
+A letter names a face and the letter alone means a quarter turn clockwise as seen
+from outside that face.  The suffix \texttt{2} means a half turn and \texttt{'}
+means a quarter turn anticlockwise (WCA Regulation 12a1).
+
+\begin{center}
+\begin{tabular}{@{}llll@{}}
+\toprule
+Letter & Face & Clockwise seen from & Opposite \\
+\midrule
+\texttt{U} & upper        & above   & \texttt{D} \\
+\texttt{D} & bottom       & below   & \texttt{U} \\
+\texttt{R} & right        & right   & \texttt{L} \\
+\texttt{L} & left         & left    & \texttt{R} \\
+\texttt{F} & front        & front   & \texttt{B} \\
+\texttt{B} & back         & behind  & \texttt{F} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+There are 18 face turns: \texttt{U U2 U' R R2 R' F F2 F' D D2 D' L L2 L' B B2 B'}.
+
+\subsection{Wide turns}
+
+An \texttt{w} after the letter turns the outer face \emph{and} the layer behind it
+(Regulation 12a2): \texttt{Uw Dw Lw Rw Fw Bw} with the usual suffixes, 18 moves in
+total.  The layer count may be written out, so \texttt{2Rw} is the same move as
+\texttt{Rw}; \texttt{1Rw} is not valid notation and \texttt{3Rw} does not exist on a
+$3\times3\times3$.
+
+\subsection{Rotations and slices}
+
+A rotation turns the \emph{whole} cube, including its centres, in the direction of
+a face turn (Regulation 12a4): \texttt{x} follows \texttt{R}, \texttt{y} follows
+\texttt{U} and \texttt{z} follows \texttt{F}, with the usual suffixes.
+
+The slice turns \texttt{M}, \texttt{E} and \texttt{S} turn only the middle layer,
+following \texttt{L}, \texttt{D} and \texttt{F} respectively.  They are not part of
+WCA notation but appear in many published algorithms, so the engine understands
+them; Section~\ref{sec:tables} explains how the CLI keeps the display upright when
+an algorithm uses them.
+
+\subsection{Accepted aliases}
+
+\begin{center}
+\begin{tabular}{@{}ll@{}}
+\toprule
+Written & Read as \\
+\midrule
+\texttt{r l u d f b} & \texttt{Rw Lw Uw Dw Fw Bw} (older listings) \\
+\texttt{m e s} & \texttt{M E S} \\
+\texttt{RW} & \texttt{Rw} (the \texttt{w} is case insensitive) \\
+\texttt{2Rw} & \texttt{Rw} \\
+\texttt{R2'} or \texttt{R'2} & \texttt{R2} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Anything else is rejected with the offending token and its position, for example
+\texttt{error: layer prefix '3' is invalid on a 3x3x3 cube (index=4, token='3Rw')}.
+
+\subsection{The facelet representation}
+\label{sec:facelets}
+
+The cube is a string of 54 colours in Kociemba's order: the nine facelets of
+\texttt{U}, then of \texttt{R}, \texttt{F}, \texttt{D}, \texttt{L} and \texttt{B}.
+Inside a face the facelets are numbered row by row in reading order \emph{as seen
+from outside the cube}, with the following view directions, which are the ones
+Kociemba's own move definitions use:
+
+\begin{center}
+\begin{tabular}{@{}lllll@{}}
+\toprule
+Face & View up & Top-left facelet belongs to & Top-right & Bottom-right \\
+\midrule
+\texttt{U} & back          & UBL & UBR & UFR \\
+\texttt{R} & up            & UFR & UBR & DBR \\
+\texttt{F} & up            & UFL & UFR & DFR \\
+\texttt{D} & front         & DFL & DFR & DBR \\
+\texttt{L} & up            & UBL & UFL & DFL \\
+\texttt{B} & up            & UBR & UBL & DBL \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+For example, \texttt{U9} is the upper sticker of the front-right corner,
+\texttt{R1} is the right sticker of that same corner, and \texttt{F3} is its front
+sticker, so the three facelets \texttt{(U9, R1, F3)} describe one and the same
+corner piece.  The solved cube is
+
+\begin{center}
+\texttt{UUUUUUUUURRRRRRRRRFFFFFFFFFDDDDDDDDDLLLLLLLLLBBBBBBBBB}
+\end{center}
+
+and the six centre facelets --- \texttt{U5}, \texttt{R5}, \texttt{F5}, \texttt{D5},
+\texttt{L5}, \texttt{B5} --- say which colour belongs to which face.  A state in
+which the centres have moved is still a legal cube (it has simply been turned in
+the hand); the program handles that by relabelling the colours before it reasons
+about pieces.
+
+\subsection{Moves as permutations}
+
+Every move is stored as a permutation of the 54 facelets: for each facelet, where
+its sticker goes.  The eighteen face turns were generated from the cube's geometry
+and then checked, one by one, against the move tables published on
+\texttt{kociemba.org}; wide turns are two-layer rotations, rotations are three-layer
+rotations and slices are the single middle layer.  That is why a wide move or a
+rotation can move a centre sticker and a face turn cannot.

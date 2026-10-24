@@ -1,0 +1,79 @@
+\section{Installation}
+\label{sec:install}
+
+\subsection{Requirements}
+
+\begin{itemize}[leftmargin=1.4em]
+  \item \textbf{Python 3.13} or newer.  The project is pinned to 3.13 and the
+        test suite asserts the interpreter version.
+  \item \textbf{uv}, which manages the interpreter, the virtual environment and the
+        development tools.
+  \item No runtime dependency: the engine uses the standard library only.
+\end{itemize}
+
+\subsection{From a checkout}
+
+\begin{lstlisting}[style=shell]
+# fetch a managed Python 3.13 if you do not have one
+uv python install 3.13
+
+# create .venv, install the project and the development tools
+uv sync
+
+# the stage gate: formatting, linting and the whole test suite
+scripts/check.sh
+\end{lstlisting}
+
+\texttt{uv sync} installs the project in editable mode and puts the
+\texttt{rubiks-cfop} console script in \texttt{.venv/bin}.  You can run it directly,
+through \texttt{uv run}, or through \texttt{uv tool install .} if you prefer a
+standalone command.
+
+\begin{lstlisting}[style=shell]
+uv run rubiks-cfop --scramble "R U R' U' F2"
+\end{lstlisting}
+
+\subsection{Building a wheel}
+
+\begin{lstlisting}[style=shell]
+uv build            # dist/rubiks_cfop-0.1.0-py3-none-any.whl and .tar.gz
+\end{lstlisting}
+
+The wheel is self-contained: the JSON lookup tables live inside the package
+(\texttt{rubiks\_cfop/data/}) and are installed with it, and the console script is
+declared as an entry point.
+
+\subsection{What is installed}
+
+\begin{center}
+\begin{tabular}{@{}ll@{}}
+\toprule
+Path & Contents \\
+\midrule
+\texttt{rubiks\_cfop/cube/} & facelets, moves, notation, \texttt{Cube}, \texttt{CubieCube} \\
+\texttt{rubiks\_cfop/scramble/} & random-state and random-move generators \\
+\texttt{rubiks\_cfop/solver/} & cross, F2L, OLL/PLL, CFOP pipeline, two-phase \\
+\texttt{rubiks\_cfop/render/} & the unfolded net and its text serializers \\
+\texttt{rubiks\_cfop/data/} & \texttt{oll.json}, \texttt{pll.json}, \texttt{f2l.json} \\
+\texttt{rubiks\_cfop/cli.py} & the \texttt{rubiks-cfop} command \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{The first run is slower}
+
+The random-state scrambler needs a set of precomputed tables: coordinates, move
+tables and four pruning tables totalling about six megabytes.  They are built on
+first use and then cached for the life of the process, which takes roughly ten
+seconds of CPU.  Anything that runs the scrambler should build them up front on a
+background thread:
+
+\begin{lstlisting}[style=python]
+import rubiks_cfop as cube
+
+cube.preload()          # build the scrambler tables now
+scramble = cube.generate_scramble(seed=1)
+\end{lstlisting}
+
+Solving a cube you already have does not need those tables, only the small cross
+table (one megabyte, under a second).
