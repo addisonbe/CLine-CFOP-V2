@@ -11,3 +11,9 @@ htmlcov/
 .ruff_cache/
 .hypothesis/
 .mypy_cache/
+# LaTeX build artefacts
+manual/*.pdf
+manual/*.log
+manual/*.aux
+manual/*.out
+manual/*.toc
