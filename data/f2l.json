@@ -1,0 +1,211 @@
+{
+  "schema": 1,
+  "kind": "f2l",
+  "cases": [
+    {
+      "label": "1",
+      "name": "Same Colour on Top",
+      "algorithm": "R' F R F'"
+    },
+    {
+      "label": "2",
+      "name": "Same Colour on Top",
+      "algorithm": "F R' F' R"
+    },
+    {
+      "label": "3",
+      "name": "Different Colours on Top",
+      "algorithm": "F' U' F"
+    },
+    {
+      "label": "4",
+      "name": "Different Colours on Top",
+      "algorithm": "R U R'"
+    },
+    {
+      "label": "5",
+      "name": "Same Colour on Top",
+      "algorithm": "U' R U R' U' R U2' R'"
+    },
+    {
+      "label": "6",
+      "name": "Same Colour on Top",
+      "algorithm": "d R' U' R U R' U2 R"
+    },
+    {
+      "label": "7",
+      "name": "Same Colour on Top",
+      "algorithm": "U' R U2' R' U' R U2' R'"
+    },
+    {
+      "label": "8",
+      "name": "Same Colour on Top",
+      "algorithm": "d R' U2 R U R' U2 R"
+    },
+    {
+      "label": "9",
+      "name": "Different Colours on Top",
+      "algorithm": "U' R U' R' U F' U' F"
+    },
+    {
+      "label": "10",
+      "name": "Different Colours on Top",
+      "algorithm": "U' R U R' U R U R'"
+    },
+    {
+      "label": "11",
+      "name": "Different Colours on Top",
+      "algorithm": "U' R U2' R' U F' U' F"
+    },
+    {
+      "label": "12",
+      "name": "Different Colours on Top",
+      "algorithm": "R' U2' R2 U R2' U R"
+    },
+    {
+      "label": "13",
+      "name": "Different Colours on Top",
+      "algorithm": "d R' U R U' R' U' R"
+    },
+    {
+      "label": "14",
+      "name": "Different Colours on Top",
+      "algorithm": "U' R U' R' U R U R'"
+    },
+    {
+      "label": "15",
+      "name": "Same Colour on Top",
+      "algorithm": "F' U F U2' R U R'"
+    },
+    {
+      "label": "16",
+      "name": "Same Colour on Top",
+      "algorithm": "R U' R' U2 F' U' F"
+    },
+    {
+      "label": "17",
+      "name": "Cross Colour on Top",
+      "algorithm": "R U2' R' U' R U R'"
+    },
+    {
+      "label": "18",
+      "name": "Cross Colour on Top",
+      "algorithm": "y L' U2 L U L' U' L"
+    },
+    {
+      "label": "19",
+      "name": "Cross Colour on Top",
+      "algorithm": "U R U2' R' U R U' R'"
+    },
+    {
+      "label": "20",
+      "name": "Cross Colour on Top",
+      "algorithm": "d' L' U2 L U' L' U L"
+    },
+    {
+      "label": "21",
+      "name": "Cross Colour on Top",
+      "algorithm": "R U' R' U2 R U R'"
+    },
+    {
+      "label": "22",
+      "name": "Cross Colour on Top",
+      "algorithm": "y U2 L' U' L U' L' U L"
+    },
+    {
+      "label": "23",
+      "name": "Cross Colour on Top",
+      "algorithm": "U2 R2 U2' R' U' R U' R2"
+    },
+    {
+      "label": "24",
+      "name": "Cross Colour on Top",
+      "algorithm": "F U R U' R' F' R U' R'"
+    },
+    {
+      "label": "25",
+      "name": "Corner in Slot",
+      "algorithm": "R' F' R U R U' R' F"
+    },
+    {
+      "label": "26",
+      "name": "Corner in Slot",
+      "algorithm": "U R U' R' F R' F' R"
+    },
+    {
+      "label": "27",
+      "name": "Corner in Slot",
+      "algorithm": "R U' R' U R U' R'"
+    },
+    {
+      "label": "28",
+      "name": "Corner in Slot",
+      "algorithm": "R U R' U2 F' U F"
+    },
+    {
+      "label": "29",
+      "name": "Corner in Slot",
+      "algorithm": "R' F R F' U R U' R'"
+    },
+    {
+      "label": "30",
+      "name": "Corner in Slot",
+      "algorithm": "R U R' U' R U R'"
+    },
+    {
+      "label": "31",
+      "name": "Edge in Slot",
+      "algorithm": "R U' R' F' U2' F"
+    },
+    {
+      "label": "32",
+      "name": "Edge in Slot",
+      "algorithm": "R2 U R2 U R2 U2 R2"
+    },
+    {
+      "label": "33",
+      "name": "Edge in Slot",
+      "algorithm": "U' R U' R' U' R U2' R'"
+    },
+    {
+      "label": "34",
+      "name": "Edge in Slot",
+      "algorithm": "U R U R' U2 R U R'"
+    },
+    {
+      "label": "35",
+      "name": "Edge in Slot",
+      "algorithm": "U' R U R' U F' U' F"
+    },
+    {
+      "label": "36",
+      "name": "Edge in Slot",
+      "algorithm": "U F' U' F U' R U R'"
+    },
+    {
+      "label": "38",
+      "name": "Both Pieces in Slot",
+      "algorithm": "F' U F U' R U2' R' U' R U2' R'"
+    },
+    {
+      "label": "39",
+      "name": "Both Pieces in Slot",
+      "algorithm": "R2 U2' R' U' R U' R' U2 R'"
+    },
+    {
+      "label": "40",
+      "name": "Both Pieces in Slot",
+      "algorithm": "R U2 R U R' U R U2' R2'"
+    },
+    {
+      "label": "41",
+      "name": "Both Pieces in Slot",
+      "algorithm": "R F U R U' R' F' U' R'"
+    },
+    {
+      "label": "42",
+      "name": "Both Pieces in Slot",
+      "algorithm": "R U F R U R' U' F' R'"
+    }
+  ]
+}

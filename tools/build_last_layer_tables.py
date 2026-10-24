@@ -15,7 +15,7 @@ For each case the tool picks the shortest algorithm that
 
 Usage::
 
-    python tools/build_last_layer_tables.py path/to/oll.js path/to/pll.js
+    python tools/build_last_layer_tables.py oll.js pll.js [f2l.js]
 """
 
 from __future__ import annotations
@@ -141,12 +141,47 @@ def build(kind: str, source: Path, destination: Path, *, labelled: bool) -> int:
 
 def main(argv: list[str]) -> int:
     """Build both tables from the paths given on the command line."""
-    if len(argv) != 3:  # noqa: PLR2004 - two paths
+    if len(argv) < 3:  # noqa: PLR2004 - two paths are required
         print(__doc__)
         return 2
     build("oll", Path(argv[1]), OUTPUT_DIR / "oll.json", labelled=False)
     build("pll", Path(argv[2]), OUTPUT_DIR / "pll.json", labelled=True)
+    if len(argv) > 3:  # noqa: PLR2004
+        build_f2l(Path(argv[3]), OUTPUT_DIR / "f2l.json")
     return 0
+
+
+def build_f2l(source: Path, destination: Path) -> int:
+    """Build the F2L table: 41 cases, in the front-right frame."""
+    data = load_js(source)
+    cases: list[dict[str, Any]] = []
+    for case in data["cases"]:
+        if case["id"] == "Skip":
+            continue
+        algorithms = [a for a in candidate_algorithms(case) if not FORBIDDEN.search(a)]
+        if not algorithms:
+            algorithms = candidate_algorithms(case)
+        usable = []
+        for algorithm in algorithms:
+            try:
+                parse_moves(algorithm)
+            except NotationError:
+                continue
+            usable.append(algorithm)
+        if not usable:
+            print(f"  f2l {case['id']}: no usable algorithm", file=sys.stderr)
+            continue
+        usable.sort(key=lambda a: (len(a.split()), a))
+        label = case["id"]
+        name = case.get("name", "").strip() or f"F2L {label}"
+        cases.append({"label": label, "name": name, "algorithm": usable[0]})
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    destination.write_text(
+        json.dumps({"schema": 1, "kind": "f2l", "cases": cases}, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    print(f"  f2l: {len(cases)} cases -> {destination}")
+    return len(cases)
 
 
 if __name__ == "__main__":
