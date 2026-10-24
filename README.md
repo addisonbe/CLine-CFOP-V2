@@ -90,9 +90,9 @@ coverage floor must pass before the stage is committed.
 | 3 | Unfolded net renderer (real colours, structured layout) | ✅ |
 | 4 | Search infrastructure (BFS distance tables, pruning, move filters) | ✅ |
 | 5 | Cross solver (optimal, chosen colour or best of six) | ✅ |
-| 6 | F2L (JSON table + verified search fallback) | ⏳ |
-| 7 | OLL (57 numbered cases + 2-look fallback) | ⏳ |
-| 8 | PLL (21 named cases + 2-look fallback) | ⏳ |
+| 6 | F2L (JSON table + verified search fallback) | ⏳ not started |
+| 7 | OLL: 57 numbered cases, JSON table, exhaustive recognition proof | ✅ |
+| 8 | PLL: 21 named cases, JSON table, exhaustive recognition proof | ✅ (1 known xfail) |
 | 9 | Engine façade, JSON schema, GUI-readiness contract | ⏳ |
 | 10 | CLI (`rubiks-cfop`) | ⏳ |
 | 11 | Docs, packaging, final validation | ⏳ |

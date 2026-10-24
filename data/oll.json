@@ -1,0 +1,291 @@
+{
+  "schema": 1,
+  "kind": "oll",
+  "cases": [
+    {
+      "label": "1",
+      "name": "No Edges - Runway",
+      "algorithm": "R U2' R2' F R F' U2 R' F R F'"
+    },
+    {
+      "label": "2",
+      "name": "No Edges - Zamboni",
+      "algorithm": "F R U R' U' S R U R' U' f'"
+    },
+    {
+      "label": "3",
+      "name": "No Edges - Anti-Mouse",
+      "algorithm": "M R U R' U r U2' r' U M'"
+    },
+    {
+      "label": "4",
+      "name": "No Edges - Mouse",
+      "algorithm": "M' R' U' R U' r' U2 r U' M"
+    },
+    {
+      "label": "5",
+      "name": "Square Shape - RBWAS",
+      "algorithm": "U' r' U2' R U R' U r"
+    },
+    {
+      "label": "6",
+      "name": "Square Shape - RFWAS",
+      "algorithm": "U r U2 R' U' R U' r'"
+    },
+    {
+      "label": "7",
+      "name": "Small Lightning Bolt - RFWS",
+      "algorithm": "r U R' U R U2' r'"
+    },
+    {
+      "label": "8",
+      "name": "Small Lightning Bolt - RBWS",
+      "algorithm": "r' U' R U' R' U2 r"
+    },
+    {
+      "label": "9",
+      "name": "Fish Shape - Kite",
+      "algorithm": "U2 R U R' U' R' F R2 U R' U' F'"
+    },
+    {
+      "label": "10",
+      "name": "Fish Shape - Anti-Kite",
+      "algorithm": "U2 R U R' U R' F R F' R U2' R'"
+    },
+    {
+      "label": "11",
+      "name": "Small Lightning Bolt",
+      "algorithm": "M R U R' U R U2' R' U M'"
+    },
+    {
+      "label": "12",
+      "name": "Small Lightning Bolt",
+      "algorithm": "M' R' U' R U' R' U2 R U' M"
+    },
+    {
+      "label": "13",
+      "name": "Knight Move - Gun",
+      "algorithm": "F U R U2 R' U' R U R' F'"
+    },
+    {
+      "label": "14",
+      "name": "Knight Move - Anti-Gun",
+      "algorithm": "U2 R' F R U R' F' R F U' F'"
+    },
+    {
+      "label": "15",
+      "name": "Knight Move - Squeegee",
+      "algorithm": "U' r' U' r R' U' R U r' U r"
+    },
+    {
+      "label": "16",
+      "name": "Knight Move - Anti-Squeegee",
+      "algorithm": "U r U r' R U R' U' r U' r'"
+    },
+    {
+      "label": "17",
+      "name": "No Edges - Slash",
+      "algorithm": "U R U R' U R' F R F' U2 R' F R F'"
+    },
+    {
+      "label": "18",
+      "name": "No Edges - Crown",
+      "algorithm": "U' R U2' R2' F R F' U2 M' U R U' r'"
+    },
+    {
+      "label": "19",
+      "name": "No Edges - Bunny / Mickey",
+      "algorithm": "U2 M U R U R' U' M' R' F R F'"
+    },
+    {
+      "label": "20",
+      "name": "No Edges - X / Checkers",
+      "algorithm": "r U R' U' M2' U R U' R' U' M'"
+    },
+    {
+      "label": "21",
+      "name": "H / Double Sune",
+      "algorithm": "R' U' R U' R' U R U' R' U2 R"
+    },
+    {
+      "label": "22",
+      "name": "Pi / Bruno",
+      "algorithm": "R U2' R2' U' R2 U' R2' U2' R"
+    },
+    {
+      "label": "23",
+      "name": "U / Headlights",
+      "algorithm": "R2' D' R U2 R' D R U2 R"
+    },
+    {
+      "label": "24",
+      "name": "T / Chameleon",
+      "algorithm": "U' L F R' F' L' F R F'"
+    },
+    {
+      "label": "25",
+      "name": "L / Bowtie",
+      "algorithm": "F' L F R' F' L' F R"
+    },
+    {
+      "label": "26",
+      "name": "AS / Anti-Sune",
+      "algorithm": "R' U' R U' R' U2 R"
+    },
+    {
+      "label": "27",
+      "name": "S / Sune",
+      "algorithm": "R U R' U R U2' R'"
+    },
+    {
+      "label": "28",
+      "name": "Stealth / Angel Fish",
+      "algorithm": "U M' U' M U2' M' U' M"
+    },
+    {
+      "label": "29",
+      "name": "Awkward Shape",
+      "algorithm": "U2 B' U' R' U2 R U R' U2 R U B"
+    },
+    {
+      "label": "30",
+      "name": "Awkward Shape",
+      "algorithm": "F U R U2 R' U' R U2 R' U' F'"
+    },
+    {
+      "label": "31",
+      "name": "P Shape - Little \"q\"",
+      "algorithm": "U' R' U' F U R U' R' F' R"
+    },
+    {
+      "label": "32",
+      "name": "P Shape - Little \"d\"",
+      "algorithm": "U' R U B' U' R' U R B R'"
+    },
+    {
+      "label": "33",
+      "name": "T Shape - Key",
+      "algorithm": "U' R U R' U' R' F R F'"
+    },
+    {
+      "label": "34",
+      "name": "C Shape - City (C and T)",
+      "algorithm": "R U R' U' B' R' F R F' B"
+    },
+    {
+      "label": "35",
+      "name": "Fish Shape - Fish Salad",
+      "algorithm": "U' R U2' R2' F R F' R U2' R'"
+    },
+    {
+      "label": "36",
+      "name": "W Shape - Wario",
+      "algorithm": "U' R' U' R U' R' U2 R R' U' R U R B' R' B"
+    },
+    {
+      "label": "37",
+      "name": "Fish Shape - Mounted Fish",
+      "algorithm": "U' F R' F' R U R U' R'"
+    },
+    {
+      "label": "38",
+      "name": "W Shape - Mario",
+      "algorithm": "U2 R U R' U R U' R' U' R' F R F'"
+    },
+    {
+      "label": "39",
+      "name": "Big Lightning Bolt",
+      "algorithm": "R B' R' U' R U B U' R'"
+    },
+    {
+      "label": "40",
+      "name": "Big Lightning Bolt",
+      "algorithm": "U R' F R U R' U' F' U R"
+    },
+    {
+      "label": "41",
+      "name": "Awkward Shape",
+      "algorithm": "R U R' U R U2' R' F R U R' U' F'"
+    },
+    {
+      "label": "42",
+      "name": "Awkward Shape",
+      "algorithm": "U2 R' U' R U' R' U2 R F R U R' U' F'"
+    },
+    {
+      "label": "43",
+      "name": "P Shape - Little \"b\"",
+      "algorithm": "U B' U' R' U R B"
+    },
+    {
+      "label": "44",
+      "name": "P Shape - Little \"p\"",
+      "algorithm": "U F U R U' R' F'"
+    },
+    {
+      "label": "45",
+      "name": "T Shape - Suit Up",
+      "algorithm": "R' F' U' F U R"
+    },
+    {
+      "label": "46",
+      "name": "C Shape - Seein' Headlights",
+      "algorithm": "U R' U' R' F R F' U R"
+    },
+    {
+      "label": "47",
+      "name": "L Shape - Anti-Breakneck",
+      "algorithm": "B' R' U' R U R' U' R U B"
+    },
+    {
+      "label": "48",
+      "name": "L Shape - Breakneck",
+      "algorithm": "F R U R' U' R U R' U' F'"
+    },
+    {
+      "label": "49",
+      "name": "L Shape - RB Squeezy",
+      "algorithm": "r U' r2' U r2 U r2' U' r"
+    },
+    {
+      "label": "50",
+      "name": "L Shape - RF Squeezy",
+      "algorithm": "U' R U2 R' U' R U' R' F R U R' U' F'"
+    },
+    {
+      "label": "51",
+      "name": "I Shape - Ant / Bottle Cap",
+      "algorithm": "U2 F U R U' R' U R U' R' F'"
+    },
+    {
+      "label": "52",
+      "name": "I Shape - Rice Cooker",
+      "algorithm": "U2 R U R' U R U' B U' B' R'"
+    },
+    {
+      "label": "53",
+      "name": "L Shape - Frying Pan",
+      "algorithm": "r' U' R U' R' U R U' R' U2 r"
+    },
+    {
+      "label": "54",
+      "name": "L Shape - Anti-Frying Pan",
+      "algorithm": "r U R' U R U' R' U R U2' r'"
+    },
+    {
+      "label": "55",
+      "name": "I Shape - Highway",
+      "algorithm": "U R U2' R2' U' R U' R' U2' F R F'"
+    },
+    {
+      "label": "56",
+      "name": "I Shape - Street Lights",
+      "algorithm": "r U r' U R U' R' U R U' R' r U' r'"
+    },
+    {
+      "label": "57",
+      "name": "H / I",
+      "algorithm": "U R U R' U' M' U R U' r'"
+    }
+  ]
+}
