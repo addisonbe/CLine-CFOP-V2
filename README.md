@@ -28,10 +28,26 @@ scripts/check.sh        # the stage gate: ruff format + ruff check + pytest
   `UUUUUUUUURRRRRRRRRFFFFFFFFFDDDDDDDDDLLLLLLLLLBBBBBBBBB`.
 * **Moves** — WCA notation (Regulation 12a): face moves `U D L R F B`, wide moves
   `Uw Dw Lw Rw Fw Bw` (`2Rw` ≡ `Rw`), rotations `x y z`, each with `'` and `2`.
+  Slice moves `M E S` are supported as a documented extension because many
+  published OLL/PLL algorithms use them.
 * **Colours** — standard scheme, white up / green front (WCA Regulation 4d1):
   `U` white, `R` red, `F` green, `D` yellow, `L` orange, `B` blue.
 * **Cross** — always solved into the **bottom layer**; for a white cross the
   upper layer is therefore yellow.
+
+### Two levels of cube model
+
+| Level | What it is | Used for |
+|---|---|---|
+| `Cube` | The 54 sticker colours (the display), handling every move including rotations | everything the user sees, all move sequences, rendering |
+| `CubieCube` | 8 corners and 12 edges with orientations, relative to the centres | the cube's algebraic invariants and the solvers' piece reasoning |
+
+Whole cube rotations move the centres, so they change the *display*. `Cube.normalized()`
+undoes such a rotation to give the canonical state, and `CubieCube.from_facelets`
+normalises before projecting — which means a rotated cube projects onto exactly the
+same cubie state as its unrotated equivalent. Wide and slice moves are not elements
+of the cubie group (they move the centres); the cubie level rejects them explicitly
+and points at `Cube`.
 
 ## Engine contract
 
@@ -49,7 +65,7 @@ coverage floor must pass before the stage is committed.
 | Stage | Scope | Status |
 |---|---|---|
 | 0 | Bootstrap, tooling, package skeleton, engine contract tests | ✅ |
-| 1 | Cube core: facelets, 18 face + 18 wide + 9 rotation moves, notation | ⏳ |
+| 1 | Cube core: facelets, 18 face + 18 wide + 9 rotation moves, notation | ✅ |
 | 2a | Random-move scrambler | ⏳ |
 | 2b | Random-state scrambler (WCA 4b3) via two-phase solver | ⏳ |
 | 3 | Unfolded net renderer (real colours, structured layout) | ⏳ |

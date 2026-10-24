@@ -87,7 +87,10 @@ ignore = [
     "COM812", # trailing comma: handled by `ruff format`
     "D203",   # blank line before class docstring: conflicts with D211
     "D213",   # multi-line summary on second line: conflicts with D212
+    "EM101",  # exception messages are built inline and carry structured details
+    "EM102",  # the same, for f-strings: the message is the useful part
     "ISC001", # single-line implicit string concatenation: handled by `ruff format`
+    "TRY003", # long messages belong where the context is, not in the class
 ]
 
 [tool.ruff.lint.per-file-ignores]
@@ -114,6 +117,7 @@ convention = "google"
 [tool.pytest.ini_options]
 minversion = "8.0"
 testpaths = ["tests"]
+pythonpath = ["."]
 addopts = [
     "-q",
     "--strict-markers",

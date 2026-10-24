@@ -20,6 +20,24 @@ Design constraints (enforced by tests)
 
 from __future__ import annotations
 
+from rubiks_cfop.cube import (
+    MOVES,
+    SOLVED_FACELETS,
+    Color,
+    Cube,
+    CubieCube,
+    Face,
+    Move,
+    MoveKind,
+    format_moves,
+    get_move,
+    invert,
+    is_valid_token,
+    normalize_sequence,
+    parse_moves,
+    parse_scramble,
+    validate_facelets,
+)
 from rubiks_cfop.errors import (
     CancelledError,
     InvalidMoveError,
@@ -33,12 +51,28 @@ from rubiks_cfop.errors import (
 __version__ = "0.1.0"
 
 __all__ = [
+    "MOVES",
+    "SOLVED_FACELETS",
     "CancelledError",
+    "Color",
+    "Cube",
+    "CubieCube",
+    "Face",
     "InvalidMoveError",
     "InvalidStateError",
+    "Move",
+    "MoveKind",
     "NotationError",
     "RubiksError",
     "SolveTimeoutError",
     "UnsolvableStateError",
     "__version__",
+    "format_moves",
+    "get_move",
+    "invert",
+    "is_valid_token",
+    "normalize_sequence",
+    "parse_moves",
+    "parse_scramble",
+    "validate_facelets",
 ]
