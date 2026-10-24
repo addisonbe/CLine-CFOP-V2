@@ -49,6 +49,25 @@ same cubie state as its unrotated equivalent. Wide and slice moves are not eleme
 of the cubie group (they move the centres); the cubie level rejects them explicitly
 and points at `Cube`.
 
+### Scrambles
+
+`generate_scramble()` defaults to **random-state** scrambles, which is what WCA
+Regulation 4b3 requires for the 3x3x3: a uniformly random state, solved to obtain
+the scramble.  The result is 20 to 22 moves, in the range of the official TNoodle
+scrambles.  `style="random-move"` gives a filtered random-move sequence instead,
+which is instant but *not* WCA-legal for the 3x3x3 (4b3e permits random-move only
+for 5x5x5 and larger).
+
+The random-state generator solves the drawn state with a Kociemba style
+**two-phase solver** (`rubiks_cfop.solver`), which doubles as an independent oracle
+that the CFOP pipeline is checked against.  Building its tables takes about 10
+seconds of CPU, so they are built lazily on first use and cached for the life of
+the process; a GUI should call `rubiks_cfop.preload()` on a background thread at
+startup.  Generating a scramble afterwards takes well under a second on average.
+
+Scrambles are deterministic for a given `seed`, and the seed is always recorded in
+the result, so any scramble can be reproduced or shared.
+
 ## Engine contract
 
 * no output on `stdout`/`stderr`, no environment access, no `sys.argv` reads,
@@ -67,7 +86,7 @@ coverage floor must pass before the stage is committed.
 | 0 | Bootstrap, tooling, package skeleton, engine contract tests | ✅ |
 | 1 | Cube core: facelets, 18 face + 18 wide + 9 rotation moves, notation | ✅ |
 | 2a | Random-move scrambler | ✅ |
-| 2b | Random-state scrambler (WCA 4b3) via two-phase solver | ⏳ |
+| 2b | Random-state scrambler (WCA 4b3) via two-phase solver | ✅ |
 | 3 | Unfolded net renderer (real colours, structured layout) | ⏳ |
 | 4 | Search infrastructure (BFS/IDA\*, pruning tables, filters) | ⏳ |
 | 5 | Cross solver (chosen colour or best of six) | ⏳ |

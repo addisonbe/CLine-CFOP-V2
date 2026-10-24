@@ -132,10 +132,9 @@ def test_generate_scramble_rejects_unknown_style() -> None:
         generate_scramble(style="random-turn")
 
 
-def test_random_state_style_is_not_available_yet() -> None:
-    """Stage 2b adds random-state scrambles; until then the style must say so."""
-    with pytest.raises(ValueError, match="not implemented yet"):
-        generate_scramble(style="random-state")
+def test_random_state_style_is_dispatched_elsewhere() -> None:
+    """The random-state generator has its own module and test file."""
+    assert generate_scramble(seed=3, style="random-state").style.value == "random-state"
 
 
 def test_generate_scrambles_are_independent() -> None:
@@ -157,14 +156,13 @@ def test_generate_scrambles_empty() -> None:
 
 
 def test_generate_scrambles_without_a_seed_still_works() -> None:
-    scrambles = generate_scrambles(3)
+    scrambles = generate_scrambles(3, style="random-move")
     assert len(scrambles) == 3
     assert len({scramble.seed for scramble in scrambles}) == 3
 
 
-def test_generate_scrambles_rejects_random_state_for_now() -> None:
-    with pytest.raises(ValueError, match="not implemented yet"):
-        generate_scrambles(2, style="random-state")
+def test_generate_scrambles_accepts_random_state() -> None:
+    assert len(generate_scrambles(1, seed=4, style="random-state")) == 1
 
 
 def test_scramble_from_moves_derives_the_state() -> None:

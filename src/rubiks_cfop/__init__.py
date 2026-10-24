@@ -20,6 +20,7 @@ Design constraints (enforced by tests)
 
 from __future__ import annotations
 
+from rubiks_cfop.cancel import CancelToken
 from rubiks_cfop.cube import (
     MOVES,
     SOLVED_FACELETS,
@@ -44,6 +45,7 @@ from rubiks_cfop.errors import (
     InvalidStateError,
     NotationError,
     RubiksError,
+    SearchLimitError,
     SolveTimeoutError,
     UnsolvableStateError,
 )
@@ -53,12 +55,14 @@ from rubiks_cfop.scramble import (
     generate_scramble,
     generate_scrambles,
 )
+from rubiks_cfop.solver import SearchLimits, preload, solve
 
 __version__ = "0.1.0"
 
 __all__ = [
     "MOVES",
     "SOLVED_FACELETS",
+    "CancelToken",
     "CancelledError",
     "Color",
     "Cube",
@@ -72,6 +76,8 @@ __all__ = [
     "RubiksError",
     "Scramble",
     "ScrambleStyle",
+    "SearchLimitError",
+    "SearchLimits",
     "SolveTimeoutError",
     "UnsolvableStateError",
     "__version__",
@@ -84,5 +90,7 @@ __all__ = [
     "normalize_sequence",
     "parse_moves",
     "parse_scramble",
+    "preload",
+    "solve",
     "validate_facelets",
 ]

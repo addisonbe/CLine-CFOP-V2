@@ -15,6 +15,7 @@ __all__ = [
     "InvalidStateError",
     "NotationError",
     "RubiksError",
+    "SearchLimitError",
     "SolveTimeoutError",
     "UnsolvableStateError",
 ]
@@ -97,3 +98,13 @@ class SolveTimeoutError(RubiksError):
     """
 
     code = "solve-timeout"
+
+
+class SearchLimitError(RubiksError):
+    """A search exhausted its depth budget without finding a solution.
+
+    This is not a statement about the cube: the state is solvable, the search was
+    simply not given enough room.  Raise the depth limits and try again.
+    """
+
+    code = "search-limit"
