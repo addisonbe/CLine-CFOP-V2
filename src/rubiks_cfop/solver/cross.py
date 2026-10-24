@@ -47,6 +47,7 @@ __all__ = [
     "cross_is_solved",
     "cross_solved_in_display",
     "cross_state",
+    "rotation_to_bottom",
     "solve_best_cross",
     "solve_cross",
     "solve_cross_for_color",
@@ -287,6 +288,11 @@ def _rotations_to_bottom() -> dict[Color, tuple[Move, ...]]:
         center = Face(state.face_facelets(Face.D)[4])
         lookup.setdefault(FACE_COLOR[center], tuple(get_move(name) for name in sequence))
     return lookup
+
+
+def rotation_to_bottom(color: Color) -> tuple[Move, ...]:
+    """Return a rotation that brings ``color`` to the bottom face."""
+    return _rotations_to_bottom()[Color(color)]
 
 
 def solve_cross_for_color(cube: Cube, color: Color | str) -> CrossResult:

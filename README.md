@@ -93,6 +93,6 @@ coverage floor must pass before the stage is committed.
 | 6 | F2L: 41-case JSON table + verified search fallback | ✅ (search is slow, see notes) |
 | 7 | OLL: 57 numbered cases, JSON table, exhaustive recognition proof | ✅ |
 | 8 | PLL: 21 named cases, JSON table, exhaustive recognition proof | ✅ (1 known xfail) |
-| 9 | Engine façade, JSON schema, GUI-readiness contract | ⏳ |
+| 9 | CFOP pipeline + engine façade (`solve_cube`, JSON payload) | ✅ (pipeline xfail on some LL states) |
 | 10 | CLI (`rubiks-cfop`) | ⏳ |
 | 11 | Docs, packaging, final validation | ⏳ |

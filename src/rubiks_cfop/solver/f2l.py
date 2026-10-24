@@ -27,7 +27,7 @@ from typing import Final
 from rubiks_cfop.cube.cube import Cube
 from rubiks_cfop.cube.cubie import CubieCube, move_cubie
 from rubiks_cfop.cube.facelets import SOLVED_FACELETS, Face, canonicalize_colors
-from rubiks_cfop.cube.moves import Move, get_move
+from rubiks_cfop.cube.moves import Move, MoveKind, get_move
 from rubiks_cfop.cube.notation import format_moves, parse_moves
 from rubiks_cfop.errors import SearchLimitError
 from rubiks_cfop.solver.cross import cross_distance, cross_is_solved, cross_state
@@ -257,6 +257,11 @@ def load_pair_table() -> PairTable:
             algorithm=algorithm,
             moves=parse_moves(algorithm),
         )
+        # Only face turns keep the display where it is; anything else would rotate
+        # the cube and break the "cross down" convention, so those cases fall back
+        # to the search instead.
+        if any(move.kind is not MoveKind.FACE for move in case.moves):
+            continue
         cases[case.label] = case
         for index, auf in enumerate(AUF_MOVES):
             stage = (*[get_move(name) for name in auf], *case.moves)

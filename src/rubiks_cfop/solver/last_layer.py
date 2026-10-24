@@ -23,16 +23,20 @@ from dataclasses import dataclass
 from enum import StrEnum
 from functools import lru_cache
 from pathlib import Path
-from typing import TYPE_CHECKING, Final
+from typing import Final
 
 from rubiks_cfop.cube.cube import Cube
-from rubiks_cfop.cube.facelets import SOLVED_FACELETS
+from rubiks_cfop.cube.cubie import CubieCube
+from rubiks_cfop.cube.facelets import SOLVED_FACELETS, canonicalize_colors
 from rubiks_cfop.cube.moves import Move, get_move
 from rubiks_cfop.cube.notation import format_moves, parse_moves
 from rubiks_cfop.errors import InvalidStateError, UnsolvableStateError
 
-if TYPE_CHECKING:
-    from rubiks_cfop.cube.cubie import CubieCube
+
+def display_cubie(cube: Cube) -> CubieCube:
+    """Project a cube in the display frame: the faces the viewer sees."""
+    return CubieCube.from_facelets(canonicalize_colors(cube.facelets))
+
 
 __all__ = [
     "DATA_DIR",
@@ -160,12 +164,13 @@ class LastLayerTable:
     patterns: dict[tuple[int, ...], tuple[LastLayerCase, int]]
 
     def recognize(self, cube: Cube) -> tuple[LastLayerCase, int] | None:
-        """Return the case of ``cube`` and the AUF needed before its algorithm."""
-        pattern = (
-            oll_pattern(cube.cubie())
-            if self.kind == LastLayerKind.OLL
-            else pll_pattern(cube.cubie())
-        )
+        """Return the case of ``cube`` and the AUF needed before its algorithm.
+
+        Recognition happens in the display frame, so a cube that was reoriented on
+        purpose is still read the way the viewer sees it.
+        """
+        cubie = display_cubie(cube)
+        pattern = oll_pattern(cubie) if self.kind == LastLayerKind.OLL else pll_pattern(cubie)
         return self.patterns.get(pattern)
 
 
@@ -258,9 +263,7 @@ def _solve(cube: Cube, table: LastLayerTable) -> LastLayerResult:
         *case.moves,
         *[get_move(name) for name in AUF_MOVES[post]],
     )
-    # Wide and slice moves shift the centres, so the display is re-centred: this
-    # only changes the point of view, never the puzzle.
-    after = cube.apply_moves(moves).normalized()
+    after = cube.apply_moves(moves)
     return LastLayerResult(kind=table.kind, case=case, moves=moves, after=after)
 
 
