@@ -139,22 +139,7 @@ def test_every_oll_algorithm_orients(label: str) -> None:
     assert result.case.label == label
 
 
-@pytest.mark.parametrize(
-    "label",
-    [
-        pytest.param(
-            label,
-            marks=pytest.mark.xfail(
-                reason="known issue: this published algorithm does not finish its own case "
-                "when applied from the engine's favoured AUF",
-                strict=False,
-            ),
-        )
-        if label in {"Ga Perm", "Gb Perm"}
-        else label
-        for label in PLL_LABELS
-    ],
-)
+@pytest.mark.parametrize("label", PLL_LABELS)
 def test_every_pll_algorithm_solves(label: str) -> None:
     case = load_pll_table().cases[label]
     result = solve_pll(case_state(case.moves))

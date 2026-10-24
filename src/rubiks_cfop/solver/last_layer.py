@@ -53,7 +53,7 @@ __all__ = [
 ]
 
 #: Where the JSON lookup tables live.
-DATA_DIR: Final = Path(__file__).resolve().parents[3] / "data"
+DATA_DIR: Final = Path(__file__).resolve().parents[1] / "data"
 
 #: The four AUF adjustments of the top face, in order.
 AUF_MOVES: Final[tuple[tuple[str, ...], ...]] = ((), ("U",), ("U2",), ("U'",))
@@ -223,7 +223,9 @@ def _build_table(kind: str, path: Path) -> LastLayerTable:
                     *case.moves,
                     *[get_move(name) for name in post],
                 )
-                pattern = pattern_of(_solved_by(stage).cubie())
+                # The same projection recognition uses, so the keys line up even
+                # for algorithms whose wide or slice moves turn the display.
+                pattern = pattern_of(display_cubie(_solved_by(stage)))
                 entry = (case, pre_index, post_index)
                 existing = patterns.get(pattern)
                 if existing is not None and existing[0].label != case.label:

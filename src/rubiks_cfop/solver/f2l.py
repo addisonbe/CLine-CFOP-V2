@@ -72,7 +72,7 @@ PAIR_STATE_COUNT: Final = 8 * 3 * 12 * 2
 _UNKNOWN: Final = 255
 
 #: Where the F2L JSON table lives.
-DATA_FILE: Final = Path(__file__).resolve().parents[3] / "data" / "f2l.json"
+DATA_FILE: Final = Path(__file__).resolve().parents[1] / "data" / "f2l.json"
 
 _AXIS: Final[dict[Face, int]] = {
     Face.U: 0,

@@ -230,7 +230,7 @@ def solve_cube(
         Stage(
             label="Cross",
             kind="cross",
-            moves=started.moves,
+            moves=(*started.rotation, *started.moves),
             after=started.after,
             metadata={"color": started.color.value, "rotation": format_moves(started.rotation)},
         )
@@ -282,7 +282,7 @@ def _f2l_stage(index: int, pair: F2LResult) -> Stage:
     return Stage(
         label=f"F2L{index}",
         kind="f2l",
-        moves=pair.moves,
+        moves=_simplify(pair.moves),
         after=pair.after,
         metadata={
             "slot": pair.slot,
@@ -329,7 +329,7 @@ def _oll_stage(current: Cube) -> Stage:
     return Stage(
         label=f"OLL ({oll.label})",
         kind="oll",
-        moves=oll.moves,
+        moves=_simplify(oll.moves),
         after=oll.after,
         metadata={"number": int(oll.label), "name": oll.case.name},
     )
@@ -342,7 +342,7 @@ def _pll_stage(current: Cube) -> Stage:
         return Stage(
             label="PLL (skip)",
             kind="pll",
-            moves=finish,
+            moves=_simplify(finish),
             after=current.apply_moves(finish),
             metadata={"name": "already permuted", "case": None},
         )
@@ -352,7 +352,7 @@ def _pll_stage(current: Cube) -> Stage:
     return Stage(
         label=f"PLL ({pll.label})",
         kind="pll",
-        moves=(*pll.moves, *finish),
+        moves=_simplify((*pll.moves, *finish)),
         after=final.apply_moves(finish),
         metadata={"name": pll.case.name, "case": pll.label},
     )

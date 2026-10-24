@@ -33,7 +33,7 @@ from rubiks_cfop.cube.facelets import SOLVED_FACELETS
 from rubiks_cfop.cube.notation import parse_moves
 from rubiks_cfop.errors import NotationError
 
-OUTPUT_DIR = Path(__file__).resolve().parents[1] / "data"
+OUTPUT_DIR = Path(__file__).resolve().parents[1] / "src" / "rubiks_cfop" / "data"
 
 #: Terms that would rotate the display and break the cross-down invariant.
 FORBIDDEN = re.compile(r"\b[xyz]\b|\b[MES]\b|\b\w*w\b|\b[rludfb]\b")

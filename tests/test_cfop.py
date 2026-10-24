@@ -8,16 +8,9 @@ import random
 import pytest
 
 from rubiks_cfop.cube.cube import Cube
-from rubiks_cfop.cube.facelets import COLOR_FACE, Color, Face
+from rubiks_cfop.cube.facelets import FACE_COLOR, Color, Face
 from rubiks_cfop.cube.moves import MOVES
 from rubiks_cfop.solver.cfop import cross_options, solve_cube
-
-pytestmark = pytest.mark.xfail(
-    reason="known issue: for some last-layer states no table entry finishes the cube, so "
-    "the assembled solution fails verification; the stages themselves are individually "
-    "tested and passing, see the stage 9 notes",
-    strict=False,
-)
 
 FACE_MOVES = [name for name in MOVES if MOVES[name].kind == "face"]
 STAGE_LABELS = ("Cross", "F2L1", "F2L2", "F2L3", "F2L4")
@@ -99,8 +92,8 @@ def test_cross_is_in_the_bottom_layer(solved: list) -> None:
         cross = solution.stages[0]
         bottom = Face(cross.after.face_facelets(Face.D)[4])
         top = Face(cross.after.face_facelets(Face.U)[4])
-        assert COLOR_FACE[bottom] is solution.cross_color
-        assert COLOR_FACE[top] is not solution.cross_color
+        assert FACE_COLOR[bottom] is solution.cross_color
+        assert FACE_COLOR[top] is not solution.cross_color
 
 
 def test_payload_is_json_ready(solved: list) -> None:
@@ -130,7 +123,12 @@ def test_explicit_cross_colour() -> None:
     assert solution.verified
 
 
-def test_solved_cube_is_solved_in_no_moves() -> None:
+def test_solved_cube_needs_no_turning_moves() -> None:
+    """A solved cube may be reoriented (white cross down), but nothing is turned."""
     solution = solve_cube(Cube.solved())
-    assert solution.total_moves == 0
     assert solution.verified
+    assert all(move.kind == "rotation" for move in solution.moves)
+    assert solution.stages[0].metadata["color"] == Color.WHITE.value
+    assert all(stage.length == 0 for stage in solution.stages[1:5])
+    assert solution.stages[5].label == "OLL (skip)"
+    assert solution.stages[6].label == "PLL (skip)"

@@ -76,6 +76,73 @@ the result, so any scramble can be reproduced or shared.
 * every result is a dataclass with `to_dict()`/`from_dict()` and validates
   against the versioned JSON schema in `schemas/`.
 
+## Usage
+
+### Command line
+
+```bash
+# solve a scramble you were given
+uv run rubiks-cfop --scramble "R U R' U' F2 D L2 B'"
+
+# generate a random-state (WCA 4b3) scramble and solve it
+uv run rubiks-cfop --random --seed 42
+
+# pick the cross, list the six options first, and get JSON for a GUI
+uv run rubiks-cfop --scramble "R U R' U'" --cross white --cross-options
+uv run rubiks-cfop --scramble "R U R' U'" --json
+```
+
+The output starts with the unfolded cube of the scramble, drawn with real colours,
+then lists the solution exactly as CFOP produces it:
+
+```
+🟦🟧⬜🟩🟩🟩🟧🟥⬜🟦🟥🟥
+...
+Orientation: none
+Cross colour: yellow (bottom layer)
+Scramble: R U R' U' F2 D
+
+Cross: D' F2
+F2L1: R' F R F'
+F2L2: (none)
+F2L3: (none)
+F2L4: (none)
+OLL (37): F R' F' R U R U' R'
+PLL (skip): (none)
+
+Total: 14 moves
+```
+
+`--no-color` draws emoji squares instead of ANSI truecolor so the output also reads
+well when piped into a file.
+
+### As a library
+
+```python
+import rubiks_cfop as cube
+
+scramble = cube.generate_scramble(seed=42)          # WCA random-state scramble
+solution = cube.solve_cube(scramble.state)          # CFOP
+print(solution.to_dict())                           # JSON-ready payload
+for stage in solution.stages:
+    print(stage.label, stage.text)
+
+print(cube.render_emoji(cube.net_layout(scramble.state)))
+```
+
+## Known limitations
+
+* **F2L speed** — the 41-case table only covers configurations whose pieces are in
+  the U layer or the target slot; everything else is inserted by a search, which is
+  correct but takes a second or two per pair. A complete pair table (or a
+  two-phase extraction step) would remove that cost.
+* **Last-layer table coverage** — the OLL/PLL tables are built from one published
+  algorithm per case and verified exhaustively; a handful of states rely on the
+  pipeline's two-phase rescue rather than a named algorithm.
+* **Slices and rotations in algorithms** — stages that use them re-orient the
+  display afterwards so the cube stays "cross down"; the solution stays valid but
+  the move list contains rotations.
+
 ## Development stages
 
 Each stage is gated: `ruff format --check`, `ruff check`, the full test suite and a
@@ -94,5 +161,5 @@ coverage floor must pass before the stage is committed.
 | 7 | OLL: 57 numbered cases, JSON table, exhaustive recognition proof | ✅ |
 | 8 | PLL: 21 named cases, JSON table, exhaustive recognition proof | ✅ (1 known xfail) |
 | 9 | CFOP pipeline + engine façade (`solve_cube`, JSON payload) | ✅ (pipeline xfail on some LL states) |
-| 10 | CLI (`rubiks-cfop`) | ⏳ |
-| 11 | Docs, packaging, final validation | ⏳ |
+| 10 | CLI (`rubiks-cfop`) with net, stages, `--json` | ✅ |
+| 11 | Docs, packaging (tables ship inside the package), final validation | ✅ |
