@@ -1,0 +1,125 @@
+[project]
+name = "rubiks-cfop"
+version = "0.1.0"
+description = "WCA scramble generation and CFOP solving for the 3x3x3 Rubik's Cube, using Kociemba's facelet representation."
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = []
+classifiers = [
+    "Programming Language :: Python :: 3.13",
+    "Typing :: Typed",
+]
+
+[dependency-groups]
+dev = [
+    "hypothesis>=6.115",
+    "jsonschema>=4.23",
+    "pytest>=8.3",
+    "pytest-cov>=6.0",
+    "ruff>=0.14",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/rubiks_cfop"]
+
+[tool.ruff]
+target-version = "py313"
+line-length = 100
+src = ["src", "tests", "tools"]
+
+[tool.ruff.lint]
+select = [
+    "A",
+    "ANN",
+    "ARG",
+    "B",
+    "BLE",
+    "C4",
+    "C90",
+    "COM",
+    "D",
+    "DTZ",
+    "E",
+    "EM",
+    "ERA",
+    "F",
+    "FA",
+    "FIX",
+    "FLY",
+    "FURB",
+    "G",
+    "I",
+    "ICN",
+    "INP",
+    "ISC",
+    "LOG",
+    "N",
+    "PERF",
+    "PGH",
+    "PIE",
+    "PL",
+    "PT",
+    "PTH",
+    "Q",
+    "RET",
+    "RSE",
+    "RUF",
+    "S",
+    "SIM",
+    "SLF",
+    "SLOT",
+    "T10",
+    "T20",
+    "TD",
+    "TCH",
+    "TID",
+    "TRY",
+    "UP",
+    "W",
+    "YTT",
+]
+# Rules that conflict with the formatter or with the project's documented style.
+ignore = [
+    "COM812", # trailing comma: handled by `ruff format`
+    "D203",   # blank line before class docstring: conflicts with D211
+    "D213",   # multi-line summary on second line: conflicts with D212
+    "ISC001", # single-line implicit string concatenation: handled by `ruff format`
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = [
+    "ANN",     # tests are fully annotated in the public API, not necessarily internally
+    "ARG",     # fixtures are frequently unused inside the test body
+    "D",       # test names are the documentation
+    "ERA001",  # expected-output fixtures may look like commented-out code
+    "PLR2004", # magic numbers are the point of many assertions
+    "PT011",   # `pytest.raises` on our own specific exception types
+    "S",       # assert / subprocess usage is expected in tests
+    "SLF001",  # tests may poke at private helpers
+    "T20",     # tests print diagnostics
+    "TRY003",  # long messages inline are fine in tests
+]
+"tools/**/*.py" = ["T201", "ANN", "D"]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 12
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+addopts = [
+    "-q",
+    "--strict-markers",
+    "--strict-config",
+    "--cov=rubiks_cfop",
+    "--cov-report=term-missing:skip-covered",
+    "--cov-fail-under=90",
+]
+filterwarnings = ["error"]
