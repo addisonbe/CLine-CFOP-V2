@@ -66,7 +66,7 @@ coverage floor must pass before the stage is committed.
 |---|---|---|
 | 0 | Bootstrap, tooling, package skeleton, engine contract tests | ✅ |
 | 1 | Cube core: facelets, 18 face + 18 wide + 9 rotation moves, notation | ✅ |
-| 2a | Random-move scrambler | ⏳ |
+| 2a | Random-move scrambler | ✅ |
 | 2b | Random-state scrambler (WCA 4b3) via two-phase solver | ⏳ |
 | 3 | Unfolded net renderer (real colours, structured layout) | ⏳ |
 | 4 | Search infrastructure (BFS/IDA\*, pruning tables, filters) | ⏳ |

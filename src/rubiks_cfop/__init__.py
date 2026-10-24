@@ -47,6 +47,12 @@ from rubiks_cfop.errors import (
     SolveTimeoutError,
     UnsolvableStateError,
 )
+from rubiks_cfop.scramble import (
+    Scramble,
+    ScrambleStyle,
+    generate_scramble,
+    generate_scrambles,
+)
 
 __version__ = "0.1.0"
 
@@ -64,10 +70,14 @@ __all__ = [
     "MoveKind",
     "NotationError",
     "RubiksError",
+    "Scramble",
+    "ScrambleStyle",
     "SolveTimeoutError",
     "UnsolvableStateError",
     "__version__",
     "format_moves",
+    "generate_scramble",
+    "generate_scrambles",
     "get_move",
     "invert",
     "is_valid_token",
