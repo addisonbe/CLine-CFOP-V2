@@ -348,7 +348,7 @@ def _apply_sequence(facelets: str, names: tuple[str, ...]) -> str:
 
 
 def _center_key(facelets: str) -> str:
-    """Return the six centre letters of a facelet string, in face order."""
+    """Return the six center letters of a facelet string, in face order."""
     return "".join(facelets[index] for index in _CENTER_INDICES)
 
 
@@ -382,7 +382,7 @@ def rotations() -> tuple[tuple[str, ...], ...]:
 
 @lru_cache(maxsize=1)
 def _normalizing_rotations() -> dict[str, tuple[str, ...]]:
-    """Map a centre arrangement to the rotation that puts the centres back."""
+    """Map a center arrangement to the rotation that puts the centers back."""
     lookup: dict[str, tuple[str, ...]] = {}
     for sequence in rotations():
         rotated = _apply_sequence(SOLVED_FACELETS, sequence)
@@ -391,16 +391,16 @@ def _normalizing_rotations() -> dict[str, tuple[str, ...]]:
 
 
 def rotation_to_normalize(facelets: str) -> tuple[str, ...]:
-    """Return the whole cube rotation that puts the centres back in place.
+    """Return the whole cube rotation that puts the centers back in place.
 
     Args:
         facelets: A facelet string.
 
     Returns:
-        A rotation sequence, empty when the centres are already canonical.
+        A rotation sequence, empty when the centers are already canonical.
 
     Raises:
-        InvalidStateError: If the centre colours are not a rotation of the solved
+        InvalidStateError: If the center colors are not a rotation of the solved
             arrangement, in which case the state is not a cube.
     """
     key = _center_key(facelets)
@@ -408,7 +408,7 @@ def rotation_to_normalize(facelets: str) -> tuple[str, ...]:
         return _normalizing_rotations()[key]
     except KeyError as exc:
         raise InvalidStateError(
-            "the centre colours are not a rotation of a solved cube",
+            "the center colors are not a rotation of a solved cube",
             centers=key,
         ) from exc
 
@@ -417,9 +417,9 @@ def normalized_facelets(facelets: str) -> str:
     """Return ``facelets`` with any whole cube rotation undone.
 
     This is the canonical form used by the cubie level model and by the solvers:
-    the same physical cube, described with the centres in their home faces.
+    the same physical cube, described with the centers in their home faces.
 
     Raises:
-        InvalidStateError: If the centre colours are not a valid rotation.
+        InvalidStateError: If the center colors are not a valid rotation.
     """
     return _apply_sequence(facelets, rotation_to_normalize(facelets))

@@ -48,11 +48,13 @@ MIN_TARGET_LENGTH: Final = 21
 #: How many times to redraw a state if the search cannot handle it.
 _MAX_ATTEMPTS: Final = 8
 
-#: Wall clock budget for one attempt.  A two-phase search usually finishes in a
-#: fraction of a second, but a few states take much longer; giving up on those and
+#: Search budget for one attempt, in nodes.  A two-phase search usually finishes in
+#: a fraction of a second, but a few states take much longer; giving up on those and
 #: drawing a fresh state keeps scramble generation responsive, which is allowed
 #: because WCA 4b3 constrains the distribution of states, not which state is drawn.
-_ATTEMPT_TIMEOUT_MS: Final = 1000
+#: The budget is counted in nodes rather than milliseconds so that a seed gives the
+#: same scramble on every machine, however loaded: 400,000 nodes is about a second.
+_ATTEMPT_MAX_NODES: Final = 400_000
 
 
 def _random_permutation(rng: random.Random, size: int) -> list[int]:
@@ -149,10 +151,10 @@ def random_state_scramble(
         target = DEFAULT_MAX_LENGTH
     if limits is None:
         first_limits: SearchLimits | None = SearchLimits(
-            max_total_depth=target, timeout_ms=_ATTEMPT_TIMEOUT_MS
+            max_total_depth=target, max_nodes=_ATTEMPT_MAX_NODES
         )
         second_limits: SearchLimits | None = (
-            SearchLimits(max_total_depth=DEFAULT_MAX_LENGTH, timeout_ms=_ATTEMPT_TIMEOUT_MS)
+            SearchLimits(max_total_depth=DEFAULT_MAX_LENGTH, max_nodes=_ATTEMPT_MAX_NODES)
             if target < DEFAULT_MAX_LENGTH
             else None
         )
@@ -185,7 +187,7 @@ def _attempt(
     """Try to solve ``state``, relaxing the target if needed.
 
     Returns ``None`` when this state should be abandoned: the search ran out of
-    time, or it hit its depth budget with no relaxation left.
+    budget, or it hit its depth limit with no relaxation left.
     """
     try:
         return solve(state, limits=first_limits)
@@ -196,7 +198,7 @@ def _attempt(
             return None
     try:
         return solve(state, limits=second_limits)
-    except SolveTimeoutError:
+    except (SolveTimeoutError, SearchLimitError):
         return None
 
 

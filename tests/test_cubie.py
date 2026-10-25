@@ -122,7 +122,7 @@ def test_unknown_pieces_are_rejected() -> None:
 
 
 def test_impossible_corner_piece_is_rejected() -> None:
-    """Swapping two side stickers creates a corner colour triple that cannot exist."""
+    """Swapping two side stickers creates a corner color triple that cannot exist."""
     facelets = list(SOLVED_FACELETS)
     facelets[20], facelets[11] = facelets[11], facelets[20]  # F3 (URF) and R3 (UBR)
     with pytest.raises(InvalidStateError, match="unknown corner piece"):
@@ -130,7 +130,7 @@ def test_impossible_corner_piece_is_rejected() -> None:
 
 
 def test_impossible_edge_piece_is_rejected() -> None:
-    """Swapping an up sticker with a side sticker creates two identical edge colours."""
+    """Swapping an up sticker with a side sticker creates two identical edge colors."""
     facelets = list(SOLVED_FACELETS)
     facelets[7], facelets[10] = facelets[10], facelets[7]  # U8 (UF) and R2 (UR)
     with pytest.raises(InvalidStateError, match="unknown edge piece"):

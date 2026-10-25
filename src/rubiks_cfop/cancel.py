@@ -32,7 +32,7 @@ class CancelToken:
     __slots__ = ("_event",)
 
     def __init__(self) -> None:
-        """Create a fresh, uncancelled token."""
+        """Create a fresh, uncanceled token."""
         self._event = threading.Event()
 
     def cancel(self) -> None:

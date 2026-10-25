@@ -1,4 +1,4 @@
-"""Engine-level contract tests: headless behaviour, cheap imports, no dependencies.
+"""Engine-level contract tests: headless behavior, cheap imports, no dependencies.
 
 A GUI embeds this package in-process, so importing it must be silent, fast and
 must not drag in third-party code.

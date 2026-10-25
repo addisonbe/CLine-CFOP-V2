@@ -79,7 +79,7 @@ CORNER_FACELETS: Final[tuple[tuple[str, str, str], ...]] = (
     ("D9", "R9", "B7"),
 )
 
-#: The colours of each corner cubie, in the same order as its facelets.
+#: The colors of each corner cubie, in the same order as its facelets.
 CORNER_COLORS: Final[tuple[tuple[str, str, str], ...]] = (
     ("U", "R", "F"),
     ("U", "F", "L"),
@@ -123,7 +123,7 @@ EDGE_FACELETS: Final[tuple[tuple[str, str], ...]] = (
     ("B4", "R6"),
 )
 
-#: The colours of each edge cubie, in the same order as its facelets.
+#: The colors of each edge cubie, in the same order as its facelets.
 EDGE_COLORS: Final[tuple[tuple[str, str], ...]] = (
     ("U", "R"),
     ("U", "F"),
@@ -217,10 +217,10 @@ class CubieCube:
 
         Any whole cube rotation is undone first, so a rotated state projects onto
         the same cubie state as its unrotated equivalent: the projection describes
-        the physical cube relative to its own centres, not the way it is held.
+        the physical cube relative to its own centers, not the way it is held.
 
         To project in the *display* frame instead -- for example after reorienting
-        the cube on purpose -- relabel the colours first with
+        the cube on purpose -- relabel the colors first with
         :func:`~rubiks_cfop.cube.facelets.canonicalize_colors`.
 
         Raises:
@@ -274,10 +274,10 @@ class CubieCube:
         """Return this state after applying one move.
 
         Whole cube rotations leave the cubie state unchanged, because rotating the
-        puzzle does not rearrange any piece relative to its own centres.
+        puzzle does not rearrange any piece relative to its own centers.
 
         Raises:
-            InvalidMoveError: For wide and slice moves.  Those move the centres, so
+            InvalidMoveError: For wide and slice moves.  Those move the centers, so
                 they are not elements of the cubie group: the frame they leave
                 behind is part of their meaning.  Apply them to a
                 :class:`~rubiks_cfop.cube.cube.Cube` instead, which keeps the full
@@ -370,7 +370,7 @@ def _corner_orientation(
     facelets_of_corner: tuple[int, int, int],
     position: int,
 ) -> int:
-    """Return the index of the facelet carrying the corner's up or down colour."""
+    """Return the index of the facelet carrying the corner's up or down color."""
     for orientation in range(3):
         if facelets[facelets_of_corner[orientation]] in _UP_DOWN_COLORS:
             return orientation
@@ -382,7 +382,7 @@ def _corner_orientation(
 
 
 def _find_corner(first: str, second: str, position: int) -> int:
-    """Return the corner cubie whose two side colours match, or raise."""
+    """Return the corner cubie whose two side colors match, or raise."""
     for cubie, colors in enumerate(CORNER_COLORS):
         if first == colors[1] and second == colors[2]:
             return cubie
@@ -394,7 +394,7 @@ def _find_corner(first: str, second: str, position: int) -> int:
 
 
 def _find_edge(first: str, second: str, position: int) -> tuple[int, int]:
-    """Return the edge cubie and orientation matching two sticker colours."""
+    """Return the edge cubie and orientation matching two sticker colors."""
     for cubie, colors in enumerate(EDGE_COLORS):
         if first == colors[0] and second == colors[1]:
             return cubie, 0

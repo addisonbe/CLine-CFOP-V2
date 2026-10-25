@@ -41,7 +41,7 @@ class Cube:
     facelets: str
 
     def __post_init__(self) -> None:
-        """Validate and normalise the facelet string."""
+        """Validate and normalize the facelet string."""
         normalized = validate_facelets(self.facelets)
         if normalized != self.facelets:
             object.__setattr__(self, "facelets", normalized)
@@ -101,7 +101,7 @@ class Cube:
         return self.apply_moves(parse_scramble(text))
 
     def is_solved(self) -> bool:
-        """Return whether every face shows a single colour.
+        """Return whether every face shows a single color.
 
         A cube that has only been rotated counts as solved, because rotating the
         whole cube does not change the puzzle.
@@ -109,20 +109,20 @@ class Cube:
         return all(len(set(self.face_facelets(face))) == 1 for face in FACE_ORDER)
 
     def normalized(self) -> Cube:
-        """Return the same physical cube with its centre colours in place.
+        """Return the same physical cube with its center colors in place.
 
-        Whole cube rotations permute which colours appear on which face.  This
+        Whole cube rotations permute which colors appear on which face.  This
         returns the canonical description of the same physical cube, obtained by
         undoing that rotation, which is what the cubie level projection and the
         solvers work with.
 
         Raises:
-            InvalidStateError: If the centres are not a valid rotation.
+            InvalidStateError: If the centers are not a valid rotation.
         """
         return Cube(normalized_facelets(self.facelets))
 
     def is_canonical(self) -> bool:
-        """Return whether no whole cube rotation is reflected in the centres."""
+        """Return whether no whole cube rotation is reflected in the centers."""
         return centers_are_canonical(self.facelets)
 
     def is_solvable(self) -> bool:
@@ -138,7 +138,7 @@ class Cube:
         return face_facelets(self.facelets, face)
 
     def colors(self) -> tuple[Color, ...]:
-        """Return the 54 facelet colours, in Kociemba facelet order."""
+        """Return the 54 facelet colors, in Kociemba facelet order."""
         return tuple(FACE_COLOR[Face(letter)] for letter in self.facelets)
 
     def cubie(self) -> CubieCube:

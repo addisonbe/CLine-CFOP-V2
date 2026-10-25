@@ -23,7 +23,7 @@ Face       view up        first facelet belongs to
 ``B``      up (+y)        UBR
 =========  =============  =========================
 
-Colours follow the standard WCA scheme (Regulation 4d1: white on top, green in
+Colors follow the standard WCA scheme (Regulation 4d1: white on top, green in
 front): ``U`` white, ``R`` red, ``F`` green, ``D`` yellow, ``L`` orange and
 ``B`` blue.
 """
@@ -73,7 +73,7 @@ class Face(StrEnum):
 
 
 class Color(StrEnum):
-    """One of the six sticker colours of the standard WCA colour scheme."""
+    """One of the six sticker colors of the standard WCA color scheme."""
 
     WHITE = "white"
     RED = "red"
@@ -96,7 +96,7 @@ FACE_ORDER: Final[tuple[Face, ...]] = (Face.U, Face.R, Face.F, Face.D, Face.L, F
 #: The solved cube as a Kociemba facelet string.
 SOLVED_FACELETS: Final = "".join(face.value * FACELETS_PER_FACE for face in FACE_ORDER)
 
-#: Standard colour scheme (WCA Regulation 4d1: white up, green front).
+#: Standard color scheme (WCA Regulation 4d1: white up, green front).
 FACE_COLOR: Final[dict[Face, Color]] = {
     Face.U: Color.WHITE,
     Face.R: Color.RED,
@@ -201,18 +201,19 @@ def normalize_facelets(text: str) -> str:
 
 
 def validate_facelets(text: str) -> str:
-    """Validate a facelet string and return its normalised form.
+    """Validate a facelet string and return its normalized form.
 
     A string is valid when it has 54 characters, uses only the letters
-    ``U R F D L B``, contains each letter exactly nine times and keeps the six
-    centre facelets in place.  Solvability (orientation sums and permutation
-    parity) is checked separately by :mod:`rubiks_cfop.cube.cubie`.
+    ``U R F D L B`` and contains each letter exactly nine times.  The centers may
+    have been moved by a whole cube rotation, so they are not checked here; whether
+    they form a valid rotation, and whether the state is solvable (orientation sums
+    and permutation parity), is checked by :mod:`rubiks_cfop.cube.cubie`.
 
     Args:
         text: The facelet string, optionally containing whitespace.
 
     Returns:
-        The normalised 54 character facelet string.
+        The normalized 54 character facelet string.
 
     Raises:
         InvalidStateError: If the string is not a well formed cube state.
@@ -229,14 +230,14 @@ def validate_facelets(text: str) -> str:
     counts = {letter: normalized.count(letter) for letter in sorted(_VALID_FACELET_LETTERS)}
     wrong = {letter: count for letter, count in counts.items() if count != FACELETS_PER_FACE}
     if wrong:
-        raise InvalidStateError("each colour must appear exactly nine times", counts=wrong)
+        raise InvalidStateError("each color must appear exactly nine times", counts=wrong)
     return normalized
 
 
 def centers_are_canonical(text: str) -> bool:
-    """Return whether every centre facelet carries its own face's colour.
+    """Return whether every center facelet carries its own face's color.
 
-    Whole cube rotations move the centres, so a state is *canonical* only when no
+    Whole cube rotations move the centers, so a state is *canonical* only when no
     rotation has been applied to it.  ``normalized_facelets`` turns any state into
     that form.
     """
@@ -245,11 +246,11 @@ def centers_are_canonical(text: str) -> bool:
 
 
 def canonicalize_colors(text: str) -> str:
-    """Relabel the colours so that every centre carries its own face's colour.
+    """Relabel the colors so that every center carries its own face's color.
 
-    A whole cube rotation permutes which colours appear on which face.  Relabelling
-    the colours -- instead of moving the stickers -- keeps the physical arrangement
-    intact while naming the faces the way the viewer sees them: the colour on the
+    A whole cube rotation permutes which colors appear on which face.  Relabeling
+    the colors -- instead of moving the stickers -- keeps the physical arrangement
+    intact while naming the faces the way the viewer sees them: the color on the
     bottom face becomes ``D``, the one on the front becomes ``F``, and so on.  The
     solvers' piece coordinates are expressed in this frame.
 
@@ -257,17 +258,17 @@ def canonicalize_colors(text: str) -> str:
         text: A facelet string.
 
     Returns:
-        The relabelled string, with canonical centres.
+        The relabeled string, with canonical centers.
 
     Raises:
-        InvalidStateError: If the six centres are not six distinct colours.
+        InvalidStateError: If the six centers are not six distinct colors.
     """
     normalized = normalize_facelets(text)
     mapping: dict[str, str] = {}
     for face in FACE_ORDER:
         center = normalized[facelet_index(face, 5)]
         if center in mapping:
-            raise InvalidStateError("the six centre colours must be distinct")
+            raise InvalidStateError("the six center colors must be distinct")
         mapping[center] = face.value
     return "".join(mapping[letter] for letter in normalized)
 

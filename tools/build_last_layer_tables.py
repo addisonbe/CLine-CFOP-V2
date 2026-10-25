@@ -47,7 +47,7 @@ def load_js(path: Path) -> dict[str, Any]:
 
 
 def clean(algorithm: str) -> str:
-    """Normalise an algorithm: drop brackets, collapse whitespace."""
+    """Normalize an algorithm: drop brackets, collapse whitespace."""
     return " ".join(algorithm.replace("(", " ").replace(")", " ").split())
 
 
@@ -111,12 +111,12 @@ def choose(kind: str, case: dict[str, Any]) -> str | None:
         return None
     # Prefer algorithms that keep the display orientation (face turns only), then
     # the shortest one.  Algorithms with rotations or wide moves are still fine: the
-    # stage normalises the display afterwards, which does not change the puzzle.
+    # stage normalizes the display afterwards, which does not change the puzzle.
     usable.sort(key=lambda a: (bool(FORBIDDEN.search(a)), len(a.split()), a))
     return usable[0]
 
 
-def build(kind: str, source: Path, destination: Path, *, labelled: bool) -> int:
+def build(kind: str, source: Path, destination: Path, *, labeled: bool) -> int:
     """Build one table and return how many cases it holds."""
     data = load_js(source)
     cases: list[dict[str, Any]] = []
@@ -127,7 +127,7 @@ def build(kind: str, source: Path, destination: Path, *, labelled: bool) -> int:
         if algorithm is None:
             print(f"  {kind} {case['id']}: no usable algorithm", file=sys.stderr)
             continue
-        label = case["id"] if not labelled else f"{case['id']} Perm"
+        label = case["id"] if not labeled else f"{case['id']} Perm"
         name = case.get("name", "").strip() or label
         cases.append({"label": label, "name": name, "algorithm": algorithm})
     destination.parent.mkdir(parents=True, exist_ok=True)
@@ -144,8 +144,8 @@ def main(argv: list[str]) -> int:
     if len(argv) < 3:
         print(__doc__)
         return 2
-    build("oll", Path(argv[1]), OUTPUT_DIR / "oll.json", labelled=False)
-    build("pll", Path(argv[2]), OUTPUT_DIR / "pll.json", labelled=True)
+    build("oll", Path(argv[1]), OUTPUT_DIR / "oll.json", labeled=False)
+    build("pll", Path(argv[2]), OUTPUT_DIR / "pll.json", labeled=True)
     if len(argv) > 3:
         build_f2l(Path(argv[3]), OUTPUT_DIR / "f2l.json")
     return 0

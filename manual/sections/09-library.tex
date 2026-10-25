@@ -24,7 +24,7 @@ their inverses \\
 and a style \\
 \texttt{Scramble} & the movement list, its text, the state it produces, its seed \\
 \texttt{solve\_cube} & the CFOP pipeline: the whole solution as a \texttt{Solution} \\
-\texttt{cross\_options} & the six cross colours with their lengths, ranked \\
+\texttt{cross\_options} & the six cross colors with their lengths, ranked \\
 \texttt{Solution}, \texttt{Stage}, \texttt{CrossOption} & the result objects, each
 with \texttt{to\_dict} \\
 \texttt{solve}, \texttt{SearchLimits} & the two-phase solver on its own, with depth
@@ -75,25 +75,25 @@ for option in cube.cross_options(scramble.state):
     print(option.color.value, option.length)
 \end{lstlisting}
 
-The colour may be a \texttt{Color} or its name; \texttt{"best"} is the default.
+The color may be a \texttt{Color} or its name; \texttt{"best"} is the default.
 
 \subsection{Drawing the cube}
 
 \begin{lstlisting}[style=python]
 layout = cube.net_layout(scramble.state)   # 9 rows x 12 columns of Color
-print(cube.render_emoji(layout))           # for a terminal without colour
-print(cube.render_ansi(layout))            # 24-bit ANSI background colours
+print(cube.render_emoji(layout))           # for a terminal without color
+print(cube.render_ansi(layout))            # 24-bit ANSI colors, black lines between stickers
 
 for face, rows in layout.to_dict()["faces"].items():
     print(face, rows[0])                   # the top row of each face, by name
 \end{lstlisting}
 
-\texttt{NetLayout} holds colours, not escape codes: an interface draws the cube in
+\texttt{NetLayout} holds colors, not escape codes: an interface draws the cube in
 its own way from the same structure.  \texttt{render\_letters} exists for logs and
 diffs, and is deliberately not the default, because the program's output is meant to
-show real colours.
+show real colors.
 
-\subsection{Cancelling a solve}
+\subsection{Canceling a solve}
 
 A solve can take a few seconds, and an interactive program must be able to abandon
 one.
@@ -106,7 +106,7 @@ cancel = cube.CancelToken()
 
 def work():
     try:
-        solution = cube.solve_cube(scramble.state)
+        moves = cube.solve(scramble.state.cubie(), cancel=cancel)
     except cube.CancelledError:
         print("abandoned")
 
@@ -116,9 +116,11 @@ thread.start()
 cancel.cancel()
 \end{lstlisting}
 
-Passing a token to a solve is a matter of scheduling: the pipeline checks it at
-regular intervals and raises \texttt{CancelledError} promptly.  The two-phase solver
-accepts the same token and an optional timeout through \texttt{SearchLimits}.
+The two-phase solver checks the token at regular intervals and raises
+\texttt{CancelledError} promptly; it also accepts a wall clock timeout and a node
+budget through \texttt{SearchLimits}.  The CFOP pipeline, \texttt{solve\_cube}, does
+not take a token yet: an interface that abandons a CFOP solve should simply ignore
+its result, which is what the desktop interface does.
 
 \subsection{Errors}
 
@@ -134,7 +136,7 @@ Class & When \\
 \texttt{token} and \texttt{index} \\
 \texttt{InvalidMoveError} & a single move that is not valid on a $3\times3\times3$ \\
 \texttt{InvalidStateError} & a malformed state: wrong length, wrong counts, moved
-centres, a piece that cannot exist \\
+centers, a piece that cannot exist \\
 \texttt{UnsolvableStateError} & a well formed but impossible state: a twisted
 corner, a flipped edge, wrong parity \\
 \texttt{SearchLimitError} & a search ran out of depth budget \\

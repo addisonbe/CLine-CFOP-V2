@@ -1,7 +1,7 @@
 """The cross: the first step of CFOP.
 
 The four edges of the bottom layer are brought home, so that they line up with the
-side centres they belong to.  The cross is solved optimally: a breadth first search
+side centers they belong to.  The cross is solved optimally: a breadth first search
 over the cross subproblem yields a distance table, and a solution is then read off
 by walking downhill one move at a time.
 
@@ -24,8 +24,8 @@ from typing import Final
 
 from rubiks_cfop.cube.cube import Cube
 from rubiks_cfop.cube.cubie import EDGE_COUNT, CubieCube, move_cubie
-from rubiks_cfop.cube.facelets import FACE_COLOR, Color, Face, canonicalize_colors
-from rubiks_cfop.cube.moves import Move, get_move, rotations
+from rubiks_cfop.cube.facelets import COLOR_FACE, Color, canonicalize_colors
+from rubiks_cfop.cube.moves import Move, get_move
 from rubiks_cfop.cube.notation import format_moves
 from rubiks_cfop.errors import InvalidStateError
 from rubiks_cfop.solver.coordinates import (
@@ -71,7 +71,7 @@ CROSS_STATE_COUNT: Final = _ARRANGEMENTS * _ORIENTATIONS
 #: The cross subproblem state of a solved cross.
 SOLVED_CROSS_STATE: Final = combination_index(CROSS_POSITIONS, _PIECES) * 24 * 16
 
-#: Colour order used to break ties when picking the best cross.
+#: Color order used to break ties when picking the best cross.
 COLOR_ORDER: Final[tuple[Color, ...]] = (
     Color.WHITE,
     Color.YELLOW,
@@ -106,7 +106,7 @@ def cross_is_solved(cubie: CubieCube) -> bool:
     return cross_state(cubie) == SOLVED_CROSS_STATE
 
 
-#: Facelets of the four bottom edges and the centres they must match.
+#: Facelets of the four bottom edges and the centers they must match.
 _BOTTOM_EDGE_CHECKS: Final[tuple[tuple[str, str], ...]] = (
     ("D2", "F5"),
     ("D4", "L5"),
@@ -125,7 +125,7 @@ def cross_solved_in_display(cube: Cube) -> bool:
     """Return whether the cube shows a solved cross in its bottom layer.
 
     This is the check a human would make: the four bottom edges carry the bottom
-    colour on the bottom face, and their side stickers match the adjacent centres.
+    color on the bottom face, and their side stickers match the adjacent centers.
     """
     bottom = cube.facelet("D5")
     if any(cube.facelet(facelet) != bottom for facelet, _ in _BOTTOM_EDGE_CHECKS):
@@ -138,7 +138,7 @@ class CrossResult:
     """A solved cross, and the orientation it was solved in.
 
     Attributes:
-        color: The colour of the cross.
+        color: The color of the cross.
         rotation: The rotation applied to the scramble so that ``color`` is at the
             bottom; empty when the scramble already had it there.
         moves: The moves that solve the cross.
@@ -250,7 +250,7 @@ def solve_cross(cubie: CubieCube) -> tuple[Move, ...]:
     """Return a shortest sequence of face moves that solves the cross.
 
     Args:
-        cubie: The state to solve; its centres decide which cross is meant.
+        cubie: The state to solve; its centers decide which cross is meant.
 
     Returns:
         The moves, in order.  Empty when the cross is already solved.
@@ -277,42 +277,55 @@ def solve_cross(cubie: CubieCube) -> tuple[Move, ...]:
     return tuple(get_move(name) for name in simplify([move.name for move in solution]))
 
 
-@lru_cache(maxsize=1)
-def _rotations_to_bottom() -> dict[Color, tuple[Move, ...]]:
-    """Map each colour to a rotation that brings it to the bottom face."""
-    lookup: dict[Color, tuple[Move, ...]] = {}
-    for sequence in rotations():
-        state = Cube.solved()
-        for name in sequence:
-            state = state.apply(name)
-        center = Face(state.face_facelets(Face.D)[4])
-        lookup.setdefault(FACE_COLOR[center], tuple(get_move(name) for name in sequence))
-    return lookup
+#: Every color can be brought to the bottom face by at most one rotation.
+_BOTTOM_ROTATIONS: Final[tuple[tuple[str, ...], ...]] = (
+    (),
+    ("x",),
+    ("x'",),
+    ("x2",),
+    ("z",),
+    ("z'",),
+)
 
 
-def rotation_to_bottom(color: Color) -> tuple[Move, ...]:
-    """Return a rotation that brings ``color`` to the bottom face."""
-    return _rotations_to_bottom()[Color(color)]
+def rotation_to_bottom(color: Color | str, cube: Cube | None = None) -> tuple[Move, ...]:
+    """Return a shortest rotation that brings ``color`` to the bottom face.
+
+    Args:
+        color: The color wanted on the bottom face.
+        cube: The cube to rotate.  Its centers decide where ``color`` currently is,
+            which matters when the cube has already been rotated (for example by a
+            scramble containing ``x``).  Defaults to the solved cube.
+    """
+    target = COLOR_FACE[Color(color)].value
+    start = Cube.solved() if cube is None else cube
+    for names in _BOTTOM_ROTATIONS:
+        if start.apply_moves(names).facelet("D5") == target:
+            return tuple(get_move(name) for name in names)
+    raise InvalidStateError(  # pragma: no cover - every color has a center
+        "no rotation brings the color to the bottom",
+        color=Color(color).value,
+    )
 
 
 def solve_cross_for_color(cube: Cube, color: Color | str) -> CrossResult:
-    """Solve the cross of a chosen colour, in the bottom layer.
+    """Solve the cross of a chosen color, in the bottom layer.
 
     The cube is first rotated so that ``color`` ends up on the bottom face, which
     is the orientation the rest of the CFOP solve works in.
 
     Args:
         cube: The scrambled cube.
-        color: The colour of the cross, for example ``"white"``.
+        color: The color of the cross, for example ``"white"``.
 
     Returns:
         The rotation applied, the cross moves, and the cube before and after.
     """
     resolved = Color(color)
-    rotation = _rotations_to_bottom()[resolved]
+    rotation = rotation_to_bottom(resolved, cube)
     reoriented = cube.apply_moves(rotation)
     # Name the faces the way the viewer sees them, so that the cross table's "D
-    # layer" means the displayed bottom layer and "D" means the chosen colour.
+    # layer" means the displayed bottom layer and "D" means the chosen color.
     frame = CubieCube.from_facelets(canonicalize_colors(reoriented.facelets))
     moves = solve_cross(frame)
     return CrossResult(
@@ -335,7 +348,7 @@ def solve_best_cross(
 
     Args:
         cube: The scrambled cube.
-        colors: The colours to consider; all six by default.
+        colors: The colors to consider; all six by default.
 
     Returns:
         The best cross, with the rotation that was applied to reach it.
@@ -347,5 +360,5 @@ def solve_best_cross(
         if best is None or candidate.length < best.length:
             best = candidate
     if best is None:  # pragma: no cover - COLOR_ORDER is never empty
-        raise InvalidStateError("no cross colours to try")
+        raise InvalidStateError("no cross colors to try")
     return best

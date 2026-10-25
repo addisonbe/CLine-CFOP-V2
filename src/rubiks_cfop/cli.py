@@ -2,9 +2,9 @@
 
 The CLI is a thin adapter over the engine.  It owns everything the engine
 deliberately does not: parsing arguments, deciding whether the terminal supports
-colour, writing to stdout and choosing an exit code.
+color, writing to stdout and choosing an exit code.
 
-Output starts with the unfolded cube of the scramble, drawn with real colours, then
+Output starts with the unfolded cube of the scramble, drawn with real colors, then
 lists the solution stage by stage::
 
     Scramble: R U R' U'
@@ -26,6 +26,7 @@ from typing import TYPE_CHECKING
 
 from rubiks_cfop.cube.cube import Cube
 from rubiks_cfop.cube.facelets import Color
+from rubiks_cfop.cube.notation import format_moves
 from rubiks_cfop.errors import RubiksError
 from rubiks_cfop.render.net import net_layout, render_ansi, render_emoji
 from rubiks_cfop.scramble.random_move import random_move_scramble
@@ -74,20 +75,20 @@ def build_parser() -> argparse.ArgumentParser:
         "--cross",
         choices=("best", *[color.value for color in Color]),
         default="best",
-        help="the cross colour, or best for the shortest of the six (default)",
+        help="the cross color, or best for the shortest of the six (default)",
     )
     parser.add_argument(
         "--color",
         dest="color",
         action="store_true",
         default=None,
-        help="force colour output (default: colour when stdout is a terminal)",
+        help="force color output (default: color when stdout is a terminal)",
     )
     parser.add_argument(
         "--no-color",
         dest="color",
         action="store_false",
-        help="draw the net with emoji squares instead of ANSI colours",
+        help="draw the net with emoji squares instead of ANSI colors",
     )
     parser.add_argument("--json", action="store_true", help="print the machine-readable payload")
     parser.add_argument(
@@ -116,12 +117,12 @@ def render_solution(solution: Solution, *, color: bool) -> str:
     """Render a solution: the net first, then the scramble and the stages."""
     layout = net_layout(solution.initial)
     net = render_ansi(layout) if color else render_emoji(layout)
-    rotation = "".join(move.name for move in solution.rotation) or "none"
+    rotation = format_moves(solution.rotation) or "none"
     lines = [
         net,
         "",
         f"Orientation: {rotation}",
-        f"Cross colour: {solution.cross_color.value} (bottom layer)",
+        f"Cross color: {solution.cross_color.value} (bottom layer)",
     ]
     if solution.scramble:
         lines.append(f"Scramble: {solution.scramble}")
@@ -132,10 +133,23 @@ def render_solution(solution: Solution, *, color: bool) -> str:
     return "\n".join(lines)
 
 
+def _ensure_utf8_stdout() -> None:
+    """Make stdout able to print the emoji net.
+
+    On Windows the console and pipes default to a legacy code page (cp1252), which
+    cannot encode the emoji squares, so printing the net would crash.
+    """
+    encoding = (getattr(sys.stdout, "encoding", None) or "").lower().replace("-", "")
+    reconfigure = getattr(sys.stdout, "reconfigure", None)
+    if encoding != "utf8" and reconfigure is not None:
+        reconfigure(encoding="utf-8")
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     """Run the command line interface and return an exit code."""
     parser = build_parser()
     args = parser.parse_args(argv)
+    _ensure_utf8_stdout()
     use_color = args.color if args.color is not None else sys.stdout.isatty()
 
     try:

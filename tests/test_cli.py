@@ -19,6 +19,7 @@ def run(*args: str) -> subprocess.CompletedProcess[str]:
         [sys.executable, "-m", "rubiks_cfop.cli", *args],
         capture_output=True,
         text=True,
+        encoding="utf-8",
         check=False,
     )
 
@@ -42,9 +43,10 @@ def test_stage_labels_are_listed(solved_output: str) -> None:
 
 def test_net_comes_first(solved_output: str) -> None:
     """The unfolded cube is the first thing printed."""
-    first = solved_output.splitlines()[0]
-    assert "\u2b1c" in first or any(
-        square in first for square in "\U0001f7e5\U0001f7e6\U0001f7e7\U0001f7e8\U0001f7e9"
+    label, first_row = solved_output.splitlines()[:2]
+    assert label.strip() == "Top"
+    assert any(
+        square in first_row for square in "\u2b1c\U0001f7e5\U0001f7e6\U0001f7e7\U0001f7e8\U0001f7e9"
     )
 
 
@@ -57,7 +59,7 @@ def test_json_payload() -> None:
     assert len(payload["stages"]) >= 7
 
 
-def test_colour_output_uses_ansi() -> None:
+def test_color_output_uses_ansi() -> None:
     result = run("--scramble", SCRAMBLE, "--color")
     assert result.returncode == 0
     assert "\x1b[48;2;" in result.stdout
@@ -76,10 +78,10 @@ def test_bad_scramble_reports_an_error() -> None:
     assert result.stdout == ""
 
 
-def test_cross_colour_option() -> None:
+def test_cross_color_option() -> None:
     result = run("--scramble", SCRAMBLE, "--cross", "white", "--no-color")
     assert result.returncode == 0
-    assert "Cross colour: white" in result.stdout
+    assert "Cross color: white" in result.stdout
 
 
 def test_cross_options_listing() -> None:
@@ -93,3 +95,11 @@ def test_random_scramble_is_generated() -> None:
     result = run("--random", "--scramble-style", "random-move", "--seed", "5", "--no-color")
     assert result.returncode == 0
     assert "Scramble: " in result.stdout
+
+
+def test_orientation_is_printed_in_notation() -> None:
+    result = run("--scramble", "x", "--cross", "white", "--no-color")
+    assert result.returncode == 0
+    assert "Orientation: x\n" in result.stdout
+    result = run("--scramble", "R U", "--cross", "white", "--no-color")
+    assert "Orientation: x2" in result.stdout or "Orientation: z2" in result.stdout

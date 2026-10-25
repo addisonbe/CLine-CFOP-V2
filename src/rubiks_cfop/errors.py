@@ -73,7 +73,7 @@ class NotationError(RubiksError):
 
 
 class InvalidStateError(RubiksError):
-    """A cube state is malformed (bad length, wrong sticker counts, moved centres)."""
+    """A cube state is malformed (bad length, wrong sticker counts, moved centers)."""
 
     code = "invalid-state"
 
@@ -85,13 +85,13 @@ class UnsolvableStateError(RubiksError):
 
 
 class CancelledError(RubiksError):
-    """A solve was cancelled cooperatively through its cancellation token."""
+    """A solve was canceled cooperatively through its cancellation token."""
 
     code = "cancelled"
 
 
 class SolveTimeoutError(RubiksError):
-    """A solve exceeded its deadline.
+    """A solve exceeded its deadline or its node budget.
 
     Named with a ``Solve`` prefix so that it does not shadow the builtin
     :exc:`TimeoutError`.

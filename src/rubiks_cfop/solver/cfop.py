@@ -6,7 +6,7 @@ really solves the cube before returning it -- a solution that does not check out
 a bug, not a result.
 
 The cross is always solved into the bottom layer, and the cube is reoriented first
-so that the chosen colour is at the bottom: for a white cross the top face is
+so that the chosen color is at the bottom: for a white cross the top face is
 yellow, which is the orientation every stage after the cross assumes.
 """
 
@@ -115,7 +115,7 @@ class Solution:
     Attributes:
         initial: The cube as it was handed in.
         scramble: The scramble that produced it, when there was one.
-        cross_color: The colour of the cross.
+        cross_color: The color of the cross.
         rotation: The rotation applied so the cross sits at the bottom.
         stages: The stages, in order.
         final: The cube after the last stage; it must be solved.
@@ -159,7 +159,7 @@ class Solution:
 def cross_options(cube: Cube) -> tuple[CrossOption, ...]:
     """Return the six possible crosses, shortest first.
 
-    Ties keep the documented colour order, so the list is stable.
+    Ties keep the documented color order, so the list is stable.
     """
     options: list[CrossOption] = []
     for color in COLOR_ORDER:
@@ -213,7 +213,7 @@ def solve_cube(
 
     Args:
         cube: The scrambled cube.
-        cross: The cross colour, or ``"best"`` for the shortest of the six.
+        cross: The cross color, or ``"best"`` for the shortest of the six.
         scramble: The scramble that produced ``cube``, recorded in the result.
 
     Returns:
@@ -247,8 +247,11 @@ def solve_cube(
     current = stages[-1].after
     if not current.is_solved():
         # Every stage has a fallback, and so has the pipeline: whatever is left is
-        # finished with the two-phase solver, so a solution is always complete.
-        rescue = solve(current.cubie())
+        # finished with the two-phase solver, so a solution is always complete.  The
+        # moves are applied to the display, so the state must be projected in the
+        # display frame: ``Cube.cubie`` would undo the cross rotation first and the
+        # rescue would then turn the wrong faces.
+        rescue = solve(display_cubie(current))
         finished = current.apply_moves(rescue)
         stages.append(
             Stage(
@@ -311,7 +314,7 @@ def _safe_stage(
             kind=kind,
             moves=(),
             after=current,
-            metadata={"name": "not recognised", "fallback": True},
+            metadata={"name": "not recognized", "fallback": True},
         )
 
 

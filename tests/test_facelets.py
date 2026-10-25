@@ -1,4 +1,4 @@
-"""Facelet indexing, colour scheme and validation."""
+"""Facelet indexing, color scheme and validation."""
 
 from __future__ import annotations
 
@@ -93,7 +93,7 @@ def test_index_of_name_tolerates_case_and_space() -> None:
     assert index_of_name("b9") == 53
 
 
-def test_colour_scheme_is_the_wca_scheme() -> None:
+def test_color_scheme_is_the_wca_scheme() -> None:
     assert FACE_COLOR[Face.U] is Color.WHITE
     assert FACE_COLOR[Face.R] is Color.RED
     assert FACE_COLOR[Face.F] is Color.GREEN
@@ -143,7 +143,7 @@ def test_centers_are_canonical() -> None:
 
 
 def test_canonicalize_colors_relabels_without_moving_stickers() -> None:
-    """Relabelling names the faces the way the viewer sees them."""
+    """Relabeling names the faces the way the viewer sees them."""
     swapped = (
         SOLVED_FACELETS[27:36] + SOLVED_FACELETS[9:27] + SOLVED_FACELETS[0:9] + SOLVED_FACELETS[36:]
     )
@@ -152,11 +152,11 @@ def test_canonicalize_colors_relabels_without_moving_stickers() -> None:
     assert centers_are_canonical(canonicalize_colors(swapped))
 
 
-def test_canonicalize_colors_rejects_duplicate_centres() -> None:
+def test_canonicalize_colors_rejects_duplicate_centers() -> None:
     facelets = list(SOLVED_FACELETS)
-    facelets[4] = facelets[13]  # two centres now show R
+    facelets[4] = facelets[13]  # two centers now show R
     facelets[9] = "U"  # keep the counts balanced
-    with pytest.raises(InvalidStateError, match="six centre colours"):
+    with pytest.raises(InvalidStateError, match="six center colors"):
         canonicalize_colors("".join(facelets))
 
 

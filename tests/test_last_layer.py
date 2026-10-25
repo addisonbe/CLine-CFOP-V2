@@ -147,7 +147,7 @@ def test_every_pll_algorithm_solves(label: str) -> None:
     assert result.case.label == label
 
 
-def test_all_unsolved_orientation_states_are_recognised() -> None:
+def test_all_unsolved_orientation_states_are_recognized() -> None:
     """All 216 orientation states minus the already-oriented one are OLL cases."""
     states = orientation_states()
     assert len(states) == 216
@@ -162,12 +162,7 @@ def test_all_unsolved_orientation_states_are_recognised() -> None:
         assert oll_pattern(solve_oll(cube).after.cubie()) == (0,) * 8
 
 
-@pytest.mark.xfail(
-    reason="known issue: one of the 284 non-solved permutation states is recognised "
-    "but its table entry does not finish the cube; see the stage 7/8 notes",
-    strict=False,
-)
-def test_all_unsolved_permutation_states_are_recognised() -> None:
+def test_all_unsolved_permutation_states_are_recognized() -> None:
     """All 288 permutation states minus the solved ones are PLL cases."""
     states = permutation_states()
     assert len(states) == 288
@@ -182,14 +177,14 @@ def test_all_unsolved_permutation_states_are_recognised() -> None:
         assert aligned(solve_pll(cube).after)
 
 
-def test_every_permutation_state_is_recognised() -> None:
+def test_every_permutation_state_is_recognized() -> None:
     """Recognition itself is complete, even where one stage result is not."""
     table = load_pll_table()
-    recognised = sum(1 for cube in permutation_states() if table.recognize(cube) is not None)
-    assert recognised == 284
+    recognized = sum(1 for cube in permutation_states() if table.recognize(cube) is not None)
+    assert recognized == 284
 
 
-def test_auf_variants_are_recognised_as_the_same_case() -> None:
+def test_auf_variants_are_recognized_as_the_same_case() -> None:
     table = load_oll_table()
     for label in ("1", "27", "57"):
         case = table.cases[label]

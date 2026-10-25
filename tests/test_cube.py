@@ -19,7 +19,7 @@ def test_solved_cube() -> None:
     assert cube.is_solvable()
 
 
-def test_construction_normalises_whitespace_and_case() -> None:
+def test_construction_normalizes_whitespace_and_case() -> None:
     cube = Cube("  uuuuuuuuu rrrrrrrrr fffffffff ddddddddd lllllllll bbbbbbbbb ")
     assert cube == Cube.solved()
 

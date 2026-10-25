@@ -1,25 +1,32 @@
 \section{A plan for the graphical interface}
 \label{app:gui}
 
-This appendix plans the desktop interface that will sit on top of the engine.  It is
-a plan, not a description of shipped code: nothing here exists yet.  The engine was
-built headless precisely so that this work could be added without rewriting it, and
-the plan below leans on what is already there.
+This appendix plans the desktop interface that sits on top of the engine.  The
+engine was built headless precisely so that this work could be added without
+rewriting it, and the plan below leans on what is already there.
+
+\textbf{Status.}  Milestones M0 to M3 are implemented in the \texttt{rubiks\_cfop.gui}
+package and start with \texttt{rubiks-cfop-gui} (or \texttt{python -m
+rubiks\_cfop.gui}): the scramble bar with random scrambles and seeds, the net
+canvas drawn through a painter, the solution table and a move-by-move player.  From
+M4, a superseded job's result is ignored rather than the solve being canceled,
+because \texttt{solve\_cube} does not take a cancellation token yet.  The plan for a
+3D view is in \texttt{docs/gui-3d-plan.md}.
 
 \subsection{Goals and non-goals}
 
 \textbf{Goals.}
 
 \begin{enumerate}[leftmargin=1.4em]
-  \item Show the scrambled cube as a clear, coloured net, and let the user read a
+  \item Show the scrambled cube as a clear, colored net, and let the user read a
   solution stage by stage.
   \item Accept a scramble typed by the user, a facelet string from another tool, or
   a generated scramble with a reproducible seed.
-  \item Let the user choose the cross colour, or let the program choose the best one
+  \item Let the user choose the cross color, or let the program choose the best one
   and say what it chose.
   \item Animate a solution move by move, with play, pause, step and a stage scrubber.
   \item Stay responsive: never block the window while solving, and always allow the
-  solve to be cancelled.
+  solve to be canceled.
   \item Present errors as information, not as a crash: a bad token should be shown
   at its position in the input.
 \end{enumerate}
@@ -46,17 +53,17 @@ Engine facility & What the interface does with it \\
 \texttt{Cube.apply\_scramble} & turns the typed scramble into a state, raising
 \texttt{NotationError} with the token and index to highlight \\
 \texttt{solve\_cube} & the whole CFOP solution, already verified, with the cross
-colour, the rotation applied and every stage \\
+color, the rotation applied and every stage \\
 \texttt{Solution.to\_dict} & the payload the interface renders: stage labels, move
 lists, and the facelets after each stage \\
 \texttt{Stage.metadata} & the OLL number, the PLL name, the F2L slot and case, for
 informative rows \\
 \texttt{cross\_options} & the six crosses with their lengths, for the picker \\
-\texttt{net\_layout} & a structured grid of colours; no escape codes to parse, and
+\texttt{net\_layout} & a structured grid of colors; no escape codes to parse, and
 no dependency on the terminal \\
-\texttt{NetLayout.to\_dict} & the six faces as colour names, ready for a web view \\
-\texttt{DEFAULT\_PALETTE} & the standard colours, so the canvas matches the CLI \\
-\texttt{CancelToken} & cancelling a solve from the interface thread \\
+\texttt{NetLayout.to\_dict} & the six faces as color names, ready for a web view \\
+\texttt{DEFAULT\_PALETTE} & the standard colors, so the canvas matches the CLI \\
+\texttt{CancelToken} & canceling a solve from the interface thread \\
 \texttt{preload} & building the scrambler tables at start-up, off the UI thread \\
 \texttt{RubiksError.to\_dict} & structured errors to display without parsing prose \\
 \bottomrule
@@ -113,7 +120,7 @@ Two rules make the plan work:
   \emph{report an error} --- and is tested with plain pytest.  Everything that is
   easy to get wrong lives here, where it can be tested headlessly.
   \item \textbf{The canvas draws through a painter interface.}  \texttt{CubeCanvas}
-  receives a \texttt{Painter} with \texttt{fill\_rect(x, y, w, h, colour)} and
+  receives a \texttt{Painter} with \texttt{fill\_rect(x, y, w, h, color)} and
   \texttt{draw\_text(...)}.  Production uses the toolkit's painter, tests use a
   recorder, so the layout can be asserted without a screen.
 \end{enumerate}
@@ -129,7 +136,7 @@ Tkinter & none (standard library) & matches the engine's zero-dependency stance;
 ships with Python; enough for a net, a table and a canvas & dated look; the
 \texttt{Canvas} widget is a little low level \\
 PySide6 / Qt & a large wheel & polished widgets, good high-DPI support, animation
-timers & a heavy dependency and a licence to respect; overkill for a net and a
+timers & a heavy dependency and a license to respect; overkill for a net and a
 table \\
 Web front-end & a server plus a browser & the JSON payload already suits it;
 portable; easy to share & a second process, a second language, and no offline
@@ -160,7 +167,7 @@ schema are the contract for it.
   \item[Player] play, pause, step forward and back, a speed slider and a stage
   scrubber.  Playing a stage animates its moves one at a time; stepping shows the
   cube after a single move.
-  \item[Cross picker] the six colours with their move counts, best first, from
+  \item[Cross picker] the six colors with their move counts, best first, from
   \texttt{cross\_options}; picking one re-solves with that cross and reports where
   the cube was rotated.
   \item[Status bar] the version, the time spent, the total move count and a
@@ -178,7 +185,7 @@ schema are the contract for it.
   threads.
   \item \textbf{One solve at a time.}  Starting a second solve cancels the first;
   the token makes that prompt and the \texttt{CancelledError} is reported as
-  \emph{cancelled}, not as a failure.
+  \emph{canceled}, not as a failure.
   \item \textbf{Results cross threads as data.}  The worker hands back
   \texttt{Solution.to\_dict()}; the UI thread rebuilds the view-model from it.  No
   engine object is shared while it is being computed.
@@ -200,8 +207,8 @@ Layer & How it is tested \\
 \midrule
 \endhead
 view-model & plain pytest: transitions, stage selection, move stepping, error
-reporting, busy and cancelled states \\
-canvas layout & a recording painter: the sequence of rectangles and colours must
+reporting, busy and canceled states \\
+canvas layout & a recording painter: the sequence of rectangles and colors must
 match \texttt{net\_layout} cell for cell \\
 payload contract & the schema file plus a test that validates
 \texttt{Solution.to\_dict()} and the CLI's \texttt{--json} against it \\
@@ -212,7 +219,7 @@ asserts the canvas state \\
 \bottomrule
 \end{longtable}
 
-The rule of thumb: if a behaviour cannot be tested without a screen, it belongs in
+The rule of thumb: if a behavior cannot be tested without a screen, it belongs in
 the view-model or below, not in the widget.
 
 \subsection{Milestones}
@@ -233,7 +240,7 @@ scrambles solved through the interface; the payload equals the CLI's
 \texttt{--json}; a bad token is reported at its index \\
 M2 & Player and animation & play, pause, step and speed animate a solution;
 stepping lands on the exact \texttt{facelets} of each stage \\
-M3 & Cross picker, seed field, preload splash & choosing a colour re-solves with
+M3 & Cross picker, seed field, preload splash & choosing a color re-solves with
 it; the same seed reproduces the same scramble; no freeze during preload \\
 M4 & Cancellation, progress, structured error dialogs & cancel returns within a
 fraction of a second and leaves the window usable; every error class renders \\

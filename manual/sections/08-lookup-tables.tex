@@ -37,7 +37,7 @@ All three files share one shape:
   \item[\texttt{schema}] the format version, so a future change can be detected
   rather than misread;
   \item[\texttt{kind}] \texttt{oll}, \texttt{pll} or \texttt{f2l}, which tells the
-  loader which recogniser to build;
+  loader which recognizer to build;
   \item[\texttt{label}] what the user sees in the solution listing --- the OLL
   number, the PLL name, or the F2L case number;
   \item[\texttt{name}] a longer description, shown by interfaces and in the JSON
@@ -57,7 +57,7 @@ uv run python tools/build_last_layer_tables.py oll.js pll.js f2l.js
 For every case the tool considers all the algorithms listed for it, keeps the ones
 that parse, checks that each one really solves its own case, and prefers the
 shortest algorithm that uses face turns only.  Those preferences matter: a wide or
-slice move shifts the centres, so an algorithm that uses one would leave the cube
+slice move shifts the centers, so an algorithm that uses one would leave the cube
 in a different orientation than the net is drawn in.
 
 \subsection{Why recognition cannot drift}

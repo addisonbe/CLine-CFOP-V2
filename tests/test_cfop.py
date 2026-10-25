@@ -115,7 +115,7 @@ def test_cross_options_are_ranked() -> None:
     assert options[0].length == min(lengths)
 
 
-def test_explicit_cross_colour() -> None:
+def test_explicit_cross_color() -> None:
     rng = random.Random(6)
     cube = Cube.solved().apply_moves([rng.choice(FACE_MOVES) for _ in range(25)])
     solution = solve_cube(cube, cross=Color.YELLOW)

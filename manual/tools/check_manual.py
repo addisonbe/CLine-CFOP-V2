@@ -3,7 +3,7 @@
 The development sandbox has no TeX distribution, so this script does what can be
 done without one: it makes sure the sources are internally consistent, that every
 included file exists, that environments and braces balance, that only ASCII is used
-(so pdflatex with T1/lmodern cannot trip over a glyph), and that every colour and
+(so pdflatex with T1/lmodern cannot trip over a glyph), and that every color and
 label referenced is defined.
 
 It is a smoke test, not a substitute for compiling: `latexmk -pdf main.tex` remains
@@ -90,7 +90,7 @@ def check(path: Path, colors: set[str], labels: set[str], problems: list[str]) -
 
     for color in COLOR_USE_RE.findall(text):
         if color not in colors:
-            problems.append(f"{name}: colour {color!r} is not defined")
+            problems.append(f"{name}: color {color!r} is not defined")
 
     labels.update(LABEL_RE.findall(text))
 
@@ -103,7 +103,7 @@ def main() -> int:
 
     main_tex = (ROOT / "main.tex").read_text(encoding="utf-8")
 
-    # Colours are defined in the preamble, and only there.
+    # Colors are defined in the preamble, and only there.
     for color in COLOR_DEF_RE.findall(main_tex):
         colors.add(color)
     for environment in ENV_BEGIN_RE.findall(strip_comments(main_tex)):
@@ -138,7 +138,7 @@ def main() -> int:
         for path in files
     )
     print(
-        f"checked {len(files)} files, {len(colors)} colours, {len(labels)} labels, "
+        f"checked {len(files)} files, {len(colors)} colors, {len(labels)} labels, "
         f"{sections} sections"
     )
     if problems:

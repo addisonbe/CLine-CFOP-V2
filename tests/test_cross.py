@@ -79,19 +79,19 @@ def test_cross_is_in_the_bottom_layer() -> None:
         assert result.after.face_facelets("D")[4] == result.before.face_facelets("D")[4]
 
 
-def test_every_colour_can_be_chosen() -> None:
+def test_every_color_can_be_chosen() -> None:
     for cube in scrambled_cubes(3):
         for color in Color:
             result = solve_cross_for_color(cube, color)
             assert result.color is color
             assert cross_solved_in_display(result.after)
-            # The chosen colour is the one showing on the bottom centre.
+            # The chosen color is the one showing on the bottom center.
             assert result.after.face_facelets("D")[4] == result.before.face_facelets("D")[4]
             assert result.before.apply_moves(result.moves) == result.after
 
 
-def test_chosen_colour_reaches_the_bottom() -> None:
-    """For a white cross the bottom centre must be white, and the top yellow."""
+def test_chosen_color_reaches_the_bottom() -> None:
+    """For a white cross the bottom center must be white, and the top yellow."""
     for cube in scrambled_cubes(5):
         result = solve_cross_for_color(cube, Color.WHITE)
         bottom = Face(result.before.face_facelets(Face.D)[4])
@@ -105,7 +105,7 @@ def test_best_cross_is_the_shortest_of_the_six() -> None:
         lengths = {color: solve_cross_for_color(cube, color).length for color in Color}
         best = solve_best_cross(cube)
         assert best.length == min(lengths.values())
-        # Ties are broken by the documented colour order.
+        # Ties are broken by the documented color order.
         expected = next(color for color in COLOR_ORDER if lengths[color] == best.length)
         assert best.color is expected
 
@@ -128,3 +128,13 @@ def test_cross_result_text_round_trips() -> None:
     replay = result.before.apply_sequence(result.text)
     assert replay == result.after
     assert get_move(result.moves[0].name).kind == "face"
+
+
+@pytest.mark.parametrize("scramble", ["x", "y R U", "z2 R U R' U' F2", "x' R U2 F"])
+def test_chosen_cross_lands_on_the_bottom_after_a_rotated_scramble(scramble: str) -> None:
+    """A scramble with rotations moves the centers; the cross must still go down."""
+    cube = Cube.solved().apply_scramble(scramble)
+    for color in Color:
+        result = solve_cross_for_color(cube, color)
+        assert FACE_COLOR[Face(result.after.facelet("D5"))] is color, color
+        assert len(result.rotation) <= 1

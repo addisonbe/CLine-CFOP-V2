@@ -3,7 +3,7 @@
 Both stages work the same way.  A JSON table lists the cases -- the 57 numbered OLL
 cases and the 21 named PLL cases -- each with one algorithm.  Recognition never
 needs a hand written pattern description: the pattern of a case is computed from
-the case itself, by inverting its algorithm, so the table and the recogniser cannot
+the case itself, by inverting its algorithm, so the table and the recognizer cannot
 drift apart.
 
 Because a case is only defined up to an adjustment of the top face, each case is
@@ -89,7 +89,7 @@ class LastLayerResult:
 
     Attributes:
         kind: ``"oll"`` or ``"pll"``.
-        case: The case that was recognised.
+        case: The case that was recognized.
         moves: The moves that perform the stage, including the AUF.
         after: The cube after the stage.
     """
@@ -130,7 +130,7 @@ def oll_pattern(cubie: CubieCube) -> tuple[int, ...]:
 
 
 def pll_pattern(cubie: CubieCube) -> tuple[int, ...]:
-    """Return the full last-layer pattern used to recognise a PLL case.
+    """Return the full last-layer pattern used to recognize a PLL case.
 
     The permutations decide the case; the orientations are included as well so that
     an oriented state can never collide with an unoriented one.
@@ -156,15 +156,16 @@ class LastLayerTable:
     Attributes:
         kind: ``"oll"`` or ``"pll"``.
         cases: The cases, keyed by label.
-        patterns: The recognition map, from pattern to ``(case, auf index)``.
+        patterns: The recognition map, from pattern to ``(case, pre-AUF index,
+            post-AUF index)``.
     """
 
     kind: str
     cases: dict[str, LastLayerCase]
-    patterns: dict[tuple[int, ...], tuple[LastLayerCase, int]]
+    patterns: dict[tuple[int, ...], tuple[LastLayerCase, int, int]]
 
-    def recognize(self, cube: Cube) -> tuple[LastLayerCase, int] | None:
-        """Return the case of ``cube`` and the AUF needed before its algorithm.
+    def recognize(self, cube: Cube) -> tuple[LastLayerCase, int, int] | None:
+        """Return the case of ``cube`` and the AUFs needed before and after it.
 
         Recognition happens in the display frame, so a cube that was reoriented on
         purpose is still read the way the viewer sees it.
@@ -252,7 +253,7 @@ def load_pll_table() -> LastLayerTable:
 
 
 def _solve(cube: Cube, table: LastLayerTable) -> LastLayerResult:
-    """Recognise the case of ``cube`` and apply its algorithm."""
+    """Recognize the case of ``cube`` and apply its algorithm."""
     match = table.recognize(cube)
     if match is None:
         raise UnsolvableStateError(

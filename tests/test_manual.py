@@ -2,7 +2,7 @@
 
 The sandbox has no TeX distribution, so this checks what can be checked without
 one: every included file exists, environments and braces balance, only ASCII is
-used, and every colour and reference is defined.  `latexmk -pdf main.tex` remains
+used, and every color and reference is defined.  `latexmk -pdf main.tex` remains
 the real build.
 """
 

@@ -3,7 +3,7 @@
 The renderer is split in two, so that a GUI can draw the cube its own way:
 
 * :func:`net_layout` turns a state into a structured :class:`NetLayout` -- a grid
-  of colours plus the facelet index behind every cell;
+  of colors plus the facelet index behind every cell;
 * :func:`render_ansi`, :func:`render_emoji` and :func:`render_letters` serialize
   that structure to text, for a terminal.
 

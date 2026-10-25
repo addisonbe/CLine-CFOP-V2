@@ -1,8 +1,9 @@
-"""The unfolded cube net: geometry, colours and text serializers."""
+"""The unfolded cube net: geometry, colors and text serializers."""
 
 from __future__ import annotations
 
 import json
+import re
 
 import pytest
 
@@ -17,6 +18,7 @@ from rubiks_cfop.cube.facelets import (
 from rubiks_cfop.render.net import (
     DEFAULT_PALETTE,
     EMPTY_CELL,
+    FACE_LABELS,
     NET_COLUMNS,
     NET_ORIGINS,
     NET_ROWS,
@@ -62,7 +64,7 @@ def test_cells_map_to_the_right_facelets() -> None:
                 assert layout.facelet(row0 + row, column0 + column) == expected
 
 
-def test_colours_follow_the_facelets() -> None:
+def test_colors_follow_the_facelets() -> None:
     layout = net_layout(SCRAMBLED)
     for row in range(NET_ROWS):
         for column in range(NET_COLUMNS):
@@ -74,7 +76,7 @@ def test_colours_follow_the_facelets() -> None:
             assert layout.cell(row, column) is FACE_COLOR[Face(letter)]
 
 
-def test_solved_cube_shows_one_colour_per_face() -> None:
+def test_solved_cube_shows_one_color_per_face() -> None:
     layout = net_layout(Cube.solved())
     for face in FACE_ORDER:
         colors = {color for row in layout.face_colors(face) for color in row}
@@ -111,30 +113,85 @@ def test_to_dict_is_json_serializable() -> None:
     assert len(round_tripped["net"]) == NET_ROWS
 
 
+ANSI_GAP = "\x1b[48;2;0;0;0m \x1b[0m"
+EMOJI_SQUARES = "⬜\U0001f7e5\U0001f7e9\U0001f7e8\U0001f7e7\U0001f7e6"
+
+# With labels, each band of faces is a name line followed by three sticker rows.
+LABEL_LINES = (0, 4, 8)
+STICKER_LINES = (1, 2, 3, 5, 6, 7, 9, 10, 11)
+
+
+def _visible(line: str) -> str:
+    """Return a line without its ANSI escape codes."""
+    return re.sub(r"\x1b\[[0-9;]*m", "", line)
+
+
 def test_ansi_rendering_uses_truecolor_blocks() -> None:
     text = render_ansi(net_layout(Cube.solved()))
     lines = text.splitlines()
-    assert len(lines) == NET_ROWS
-    assert "\x1b[48;2;255;255;255m" in text  # white, the U face
-    assert "\x1b[48;2;196;30;58m" in text  # red, the R face
+    assert len(lines) == NET_ROWS + len(LABEL_LINES)
+    assert "\x1b[38;2;255;255;255m" in text  # white, the U face
+    assert "\x1b[38;2;196;30;58m" in text  # red, the R face
     assert text.endswith("\x1b[0m")
 
 
-def test_ansi_rendering_has_no_letters() -> None:
-    text = render_ansi(net_layout(SCRAMBLED))
-    stripped = text.replace("\x1b", " ").replace("[", " ").replace("m", " ")
-    assert not any(character.isalpha() for character in stripped)
+def test_ansi_stickers_are_separated_by_black_lines() -> None:
+    lines = render_ansi(net_layout(Cube.solved())).splitlines()
+    # Each face is framed on its own: four separators per face row.
+    middle = lines[5]
+    assert middle.count(ANSI_GAP) == 16
+    assert middle.startswith(ANSI_GAP)
+    assert middle.endswith(ANSI_GAP)
+    # The U face is indented by one face width plus the spacing between faces.
+    assert lines[1].startswith(" " * 12 + ANSI_GAP)
+    assert lines[1].count(ANSI_GAP) == 4
+
+
+def test_ansi_faces_are_separate_blocks() -> None:
+    visible = [_visible(line) for line in render_ansi(net_layout(SCRAMBLED)).splitlines()]
+    assert [len(visible[index]) for index in STICKER_LINES] == [22] * 3 + [46] * 3 + [22] * 3
+    # Two blank columns separate neighboring faces.
+    assert all(visible[index][10:12] == "  " for index in (5, 6, 7))
+
+
+def test_faces_are_labeled() -> None:
+    layout = net_layout(SCRAMBLED)
+    for text in (render_ansi(layout), render_emoji(layout)):
+        lines = [_visible(line) for line in text.splitlines()]
+        assert lines[0].split() == [FACE_LABELS[Face.U]]
+        assert lines[4].split() == [FACE_LABELS[face] for face in (Face.L, Face.F, Face.R, Face.B)]
+        assert lines[8].split() == [FACE_LABELS[Face.D]]
+
+
+def test_labels_can_be_turned_off() -> None:
+    layout = net_layout(SCRAMBLED)
+    assert len(render_ansi(layout, labels=False).splitlines()) == NET_ROWS
+    assert len(render_emoji(layout, labels=False).splitlines()) == NET_ROWS
+
+
+def test_ansi_stickers_have_no_letters() -> None:
+    lines = render_ansi(net_layout(SCRAMBLED)).splitlines()
+    for index in STICKER_LINES:
+        stripped = lines[index].replace("\x1b", " ").replace("[", " ").replace("m", " ")
+        assert not any(character.isalpha() for character in stripped)
 
 
 def test_ansi_rendering_accepts_a_custom_palette() -> None:
     palette = dict.fromkeys(Color, (1, 2, 3))
     text = render_ansi(net_layout(Cube.solved()), palette=palette)
-    assert "\x1b[48;2;1;2;3m" in text
+    assert "\x1b[38;2;1;2;3m" in text
+
+
+def test_emoji_faces_are_separate_blocks() -> None:
+    lines = render_emoji(net_layout(SCRAMBLED)).splitlines()
+    middle = lines[5].split("  ")
+    assert len(middle) == 4
+    assert all(sum(character in EMOJI_SQUARES for character in face) == 3 for face in middle)
 
 
 def test_emoji_rendering_has_54_squares() -> None:
     text = render_emoji(net_layout(Cube.solved()))
-    assert len(text.splitlines()) == NET_ROWS
+    assert len(text.splitlines()) == NET_ROWS + len(LABEL_LINES)
     assert (
         sum(
             1

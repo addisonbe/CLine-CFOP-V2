@@ -168,7 +168,7 @@ def test_tight_limits_raise_search_limit_error() -> None:
         solve(state, limits=SearchLimits(max_phase1_depth=2, max_phase2_depth=2, max_total_depth=4))
 
 
-def test_cancellation_is_honoured() -> None:
+def test_cancellation_is_honored() -> None:
     rng = random.Random(6)
     state = CubieCube.solved().apply_moves([rng.choice(FACE_MOVES) for _ in range(25)])
     token = CancelToken()
@@ -204,7 +204,7 @@ def test_total_limit_smaller_than_phase_one_is_reported() -> None:
         )
 
 
-def test_timeout_is_honoured() -> None:
+def test_timeout_is_honored() -> None:
     rng = random.Random(7)
     state = CubieCube.solved().apply_moves([rng.choice(FACE_MOVES) for _ in range(25)])
     with pytest.raises(SolveTimeoutError, match="ran out of time"):
@@ -212,6 +212,13 @@ def test_timeout_is_honoured() -> None:
             state,
             limits=SearchLimits(max_phase1_depth=12, max_phase2_depth=18, timeout_ms=0),
         )
+
+
+def test_node_budget_is_honored() -> None:
+    rng = random.Random(7)
+    state = CubieCube.solved().apply_moves([rng.choice(FACE_MOVES) for _ in range(25)])
+    with pytest.raises(SolveTimeoutError, match="node budget"):
+        solve(state, limits=SearchLimits(max_nodes=1))
 
 
 def test_simplify_cancels_adjacent_turns() -> None:

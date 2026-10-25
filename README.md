@@ -41,7 +41,7 @@ scripts/check.sh        # the stage gate: ruff format + ruff check + pytest
   `Uw Dw Lw Rw Fw Bw` (`2Rw` ≡ `Rw`), rotations `x y z`, each with `'` and `2`.
   Slice moves `M E S` are supported as a documented extension because many
   published OLL/PLL algorithms use them.
-* **Colours** — standard scheme, white up / green front (WCA Regulation 4d1):
+* **Colors** — standard scheme, white up / green front (WCA Regulation 4d1):
   `U` white, `R` red, `F` green, `D` yellow, `L` orange, `B` blue.
 * **Cross** — always solved into the **bottom layer**; for a white cross the
   upper layer is therefore yellow.
@@ -50,14 +50,14 @@ scripts/check.sh        # the stage gate: ruff format + ruff check + pytest
 
 | Level | What it is | Used for |
 |---|---|---|
-| `Cube` | The 54 sticker colours (the display), handling every move including rotations | everything the user sees, all move sequences, rendering |
-| `CubieCube` | 8 corners and 12 edges with orientations, relative to the centres | the cube's algebraic invariants and the solvers' piece reasoning |
+| `Cube` | The 54 sticker colors (the display), handling every move including rotations | everything the user sees, all move sequences, rendering |
+| `CubieCube` | 8 corners and 12 edges with orientations, relative to the centers | the cube's algebraic invariants and the solvers' piece reasoning |
 
-Whole cube rotations move the centres, so they change the *display*. `Cube.normalized()`
+Whole cube rotations move the centers, so they change the *display*. `Cube.normalized()`
 undoes such a rotation to give the canonical state, and `CubieCube.from_facelets`
-normalises before projecting — which means a rotated cube projects onto exactly the
+normalizes before projecting — which means a rotated cube projects onto exactly the
 same cubie state as its unrotated equivalent. Wide and slice moves are not elements
-of the cubie group (they move the centres); the cubie level rejects them explicitly
+of the cubie group (they move the centers); the cubie level rejects them explicitly
 and points at `Cube`.
 
 ### Scrambles
@@ -83,7 +83,7 @@ the result, so any scramble can be reproduced or shared.
 
 * no output on `stdout`/`stderr`, no environment access, no `sys.argv` reads,
 * no mutable global state — solvers are reusable and thread-safe,
-* long searches are cooperatively cancellable and support timeouts,
+* long searches are cooperatively cancelable and support timeouts,
 * every result is a dataclass with `to_dict()`/`from_dict()` and validates
   against the versioned JSON schema in `schemas/`.
 
@@ -103,14 +103,25 @@ uv run rubiks-cfop --scramble "R U R' U'" --cross white --cross-options
 uv run rubiks-cfop --scramble "R U R' U'" --json
 ```
 
-The output starts with the unfolded cube of the scramble, drawn with real colours,
+The output starts with the unfolded cube of the scramble, drawn with real colors,
 then lists the solution exactly as CFOP produces it:
 
 ```
-🟦🟧⬜🟩🟩🟩🟧🟥⬜🟦🟥🟥
-...
+         Top
+        ⬜️⬜️🟧
+        ⬜️⬜️🟩
+        🟥🟨🟨
+ Left   Front   Right    Back
+🟦🟧⬜️  🟩🟩🟩  🟧🟥⬜️  🟦🟥🟥
+🟧🟧🟦  ⬜️🟩🟩  🟧🟥🟥  🟦🟦🟦
+🟦🟦🟦  🟧🟧🟥  🟨🟩🟩  🟧🟥🟥
+         Down
+        🟨🟨🟩
+        🟨🟨⬜️
+        🟨🟨⬜️
+
 Orientation: none
-Cross colour: yellow (bottom layer)
+Cross color: yellow (bottom layer)
 Scramble: R U R' U' F2 D
 
 Cross: D' F2
@@ -126,6 +137,28 @@ Total: 14 moves
 
 `--no-color` draws emoji squares instead of ANSI truecolor so the output also reads
 well when piped into a file.
+
+### Desktop interface
+
+```bash
+uv run rubiks-cfop-gui                       # or: uv run python -m rubiks_cfop.gui
+uv run rubiks-cfop-gui --scramble "R U R' U'" --cross white
+```
+
+A Tkinter window (standard library only, so no extra dependency) with:
+
+* a scramble bar that accepts a WCA scramble or a 54 letter facelet string, a
+  random scramble button with style and seed, and a cross color picker;
+* the unfolded net in the standard colors, laid out as the traditional cross;
+* the solution table, one row per stage, which jumps to the end of that stage;
+* a player that steps through the solution one move at a time (buttons, or the
+  arrow keys, Home, End and Space).
+
+Solving and scramble generation run on worker threads, so the window never freezes.
+The code is split into a toolkit-free view-model (`gui/viewmodel.py`), the net
+layout drawn through a painter interface (`gui/painter.py`) and the Tk window
+(`gui/app.py`). The plan for a future 3D view is in
+[`docs/gui-3d-plan.md`](docs/gui-3d-plan.md).
 
 ### As a library
 
@@ -165,12 +198,13 @@ coverage floor must pass before the stage is committed.
 | 1 | Cube core: facelets, 18 face + 18 wide + 9 rotation moves, notation | ✅ |
 | 2a | Random-move scrambler | ✅ |
 | 2b | Random-state scrambler (WCA 4b3) via two-phase solver | ✅ |
-| 3 | Unfolded net renderer (real colours, structured layout) | ✅ |
+| 3 | Unfolded net renderer (real colors, structured layout) | ✅ |
 | 4 | Search infrastructure (BFS distance tables, pruning, move filters) | ✅ |
-| 5 | Cross solver (optimal, chosen colour or best of six) | ✅ |
+| 5 | Cross solver (optimal, chosen color or best of six) | ✅ |
 | 6 | F2L: 41-case JSON table + verified search fallback | ✅ (search is slow, see notes) |
 | 7 | OLL: 57 numbered cases, JSON table, exhaustive recognition proof | ✅ |
-| 8 | PLL: 21 named cases, JSON table, exhaustive recognition proof | ✅ (1 known xfail) |
-| 9 | CFOP pipeline + engine façade (`solve_cube`, JSON payload) | ✅ (pipeline xfail on some LL states) |
+| 8 | PLL: 21 named cases, JSON table, exhaustive recognition proof | ✅ |
+| 9 | CFOP pipeline + engine façade (`solve_cube`, JSON payload) | ✅ |
 | 10 | CLI (`rubiks-cfop`) with net, stages, `--json` | ✅ |
 | 11 | Docs, packaging (tables ship inside the package), final validation | ✅ |
+| 12 | Desktop GUI (Tkinter): net, solution table, move-by-move player | ✅ |

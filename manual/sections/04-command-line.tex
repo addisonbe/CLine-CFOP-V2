@@ -28,7 +28,7 @@ offending token and its position, and the program exits with status 2. \\
 Start from a 54 character Kociemba facelet string instead of a scramble.  Useful
 when another tool produced the state, or when you want to solve a state you built
 by hand.  Whitespace and lower case are ignored; impossible states (a twisted
-corner, a wrong colour count, moved centres) are rejected. \\
+corner, a wrong color count, moved centers) are rejected. \\
 \texttt{--random} &
 Generate a scramble and solve it.  This is the default. \\
 \bottomrule
@@ -61,10 +61,10 @@ Option & Meaning \\
 \midrule
 \endhead
 \texttt{--cross} &
-The colour of the cross: \texttt{white}, \texttt{yellow}, \texttt{green},
+The color of the cross: \texttt{white}, \texttt{yellow}, \texttt{green},
 \texttt{blue}, \texttt{red} or \texttt{orange}.  \texttt{best} (the default) solves
 all six crosses and keeps the shortest, breaking ties in the order white, yellow,
-green, blue, red, orange.  The cube is always reoriented so that the chosen colour
+green, blue, red, orange.  The cube is always reoriented so that the chosen color
 ends up in the \emph{bottom} layer. \\
 \texttt{--cross-options} &
 Before solving, print the six crosses with their lengths, shortest first. \\
@@ -79,11 +79,11 @@ Option & Meaning \\
 \midrule
 \endhead
 \texttt{--color} &
-Force ANSI truecolour output, using 24-bit background colours and the standard
-cubing palette. \\
+Force ANSI truecolor output, using 24-bit colors, the standard
+cubing palette and thin black lines between the stickers. \\
 \texttt{--no-color} &
-Draw the net with coloured square characters instead, so the output survives being
-redirected to a file or pasted into a document.  The default is automatic: colours
+Draw the net with colored square characters instead, so the output survives being
+redirected to a file or pasted into a document.  The default is automatic: colors
 when standard output is a terminal, squares otherwise. \\
 \texttt{--json} &
 Print the machine-readable payload instead of the human listing. \\

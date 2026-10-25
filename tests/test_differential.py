@@ -84,7 +84,7 @@ def test_random_walk_stays_consistent_with_the_cubie_model() -> None:
         assert display.cubie() == CubieCube.solved().apply_moves(parse_moves(prefix)), prefix
 
 
-def test_normalisation_is_stable_under_further_rotations() -> None:
+def test_normalization_is_stable_under_further_rotations() -> None:
     rng = random.Random(606)
     for _ in range(50):
         scrambled = Cube.solved().apply_sequence(sequence_of(rng, FACE_MOVES, 12))

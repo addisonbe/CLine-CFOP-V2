@@ -38,12 +38,12 @@ uv run python manual/tools/make_figures.py
 ```
 
 This rewrites `manual/figures/net-solved.tex` and `net-scrambled.tex`.  Each cell
-becomes `\cubecell{<colour>}` (a coloured square) or `\cubeblank`, using the palette
+becomes `\cubecell{<color>}` (a colored square) or `\cubeblank`, using the palette
 defined in `main.tex` -- the same six RGB values as `DEFAULT_PALETTE` in the engine.
 
 ## Note on the toolchain
 
 The development sandbox used for this project has no TeX distribution, so the
 sources were validated structurally (every `\input` resolves, environments balance,
-braces balance, only ASCII characters are used, every colour is defined) rather than
+braces balance, only ASCII characters are used, every color is defined) rather than
 by a compile.  Building with `latexmk` above is the real check.

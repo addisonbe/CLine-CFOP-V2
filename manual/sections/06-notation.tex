@@ -5,7 +5,7 @@
 
 A letter names a face and the letter alone means a quarter turn clockwise as seen
 from outside that face.  The suffix \texttt{2} means a half turn and \texttt{'}
-means a quarter turn anticlockwise (WCA Regulation 12a1).
+means a quarter turn counterclockwise (WCA Regulation 12a1).
 
 \begin{center}
 \begin{tabular}{@{}llll@{}}
@@ -34,7 +34,7 @@ $3\times3\times3$.
 
 \subsection{Rotations and slices}
 
-A rotation turns the \emph{whole} cube, including its centres, in the direction of
+A rotation turns the \emph{whole} cube, including its centers, in the direction of
 a face turn (Regulation 12a4): \texttt{x} follows \texttt{R}, \texttt{y} follows
 \texttt{U} and \texttt{z} follows \texttt{F}, with the usual suffixes.
 
@@ -66,7 +66,7 @@ Anything else is rejected with the offending token and its position, for example
 \subsection{The facelet representation}
 \label{sec:facelets}
 
-The cube is a string of 54 colours in Kociemba's order: the nine facelets of
+The cube is a string of 54 colors in Kociemba's order: the nine facelets of
 \texttt{U}, then of \texttt{R}, \texttt{F}, \texttt{D}, \texttt{L} and \texttt{B}.
 Inside a face the facelets are numbered row by row in reading order \emph{as seen
 from outside the cube}, with the following view directions, which are the ones
@@ -96,10 +96,10 @@ corner piece.  The solved cube is
 \texttt{UUUUUUUUURRRRRRRRRFFFFFFFFFDDDDDDDDDLLLLLLLLLBBBBBBBBB}
 \end{center}
 
-and the six centre facelets --- \texttt{U5}, \texttt{R5}, \texttt{F5}, \texttt{D5},
-\texttt{L5}, \texttt{B5} --- say which colour belongs to which face.  A state in
-which the centres have moved is still a legal cube (it has simply been turned in
-the hand); the program handles that by relabelling the colours before it reasons
+and the six center facelets --- \texttt{U5}, \texttt{R5}, \texttt{F5}, \texttt{D5},
+\texttt{L5}, \texttt{B5} --- say which color belongs to which face.  A state in
+which the centers have moved is still a legal cube (it has simply been turned in
+the hand); the program handles that by relabeling the colors before it reasons
 about pieces.
 
 \subsection{Moves as permutations}
@@ -109,4 +109,4 @@ its sticker goes.  The eighteen face turns were generated from the cube's geomet
 and then checked, one by one, against the move tables published on
 \texttt{kociemba.org}; wide turns are two-layer rotations, rotations are three-layer
 rotations and slices are the single middle layer.  That is why a wide move or a
-rotation can move a centre sticker and a face turn cannot.
+rotation can move a center sticker and a face turn cannot.

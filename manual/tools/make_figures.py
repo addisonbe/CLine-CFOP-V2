@@ -3,7 +3,7 @@
 The figures are derived from the same renderer the CLI uses, so the manual can
 never drift from the program.  Run it with ``uv run python manual/tools/make_figures.py``.
 
-Every cell becomes a ``\\cubecell{<colour>}`` (a coloured square) or ``\\cubeblank``,
+Every cell becomes a ``\\cubecell{<color>}`` (a colored square) or ``\\cubeblank``,
 laid out as nine rows of twelve cells: the front face in the middle, U above it,
 D below it, and L, F, R, B across the middle band.
 """

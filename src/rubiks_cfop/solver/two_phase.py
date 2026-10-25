@@ -64,12 +64,16 @@ class SearchLimits:
         max_phase2_depth: Largest number of moves allowed in phase 2.
         max_total_depth: Largest number of moves allowed in total.
         timeout_ms: Wall clock budget in milliseconds, or ``None`` for no limit.
+        max_nodes: Budget of search nodes, or ``None`` for no limit.  Unlike a
+            wall clock budget it does not depend on the machine or its load, so a
+            search bounded by it gives the same result everywhere.
     """
 
     max_phase1_depth: int = 12
     max_phase2_depth: int = 18
     max_total_depth: int = 30
     timeout_ms: int | None = None
+    max_nodes: int | None = None
 
 
 class _Search:
@@ -100,6 +104,8 @@ class _Search:
             raise CancelledError("the solve was cancelled")
         if self._deadline is not None and time.monotonic() > self._deadline:
             raise SolveTimeoutError("the solve ran out of time", nodes=self._nodes)
+        if self.limits.max_nodes is not None and self._nodes > self.limits.max_nodes:
+            raise SolveTimeoutError("the solve ran out of its node budget", nodes=self._nodes)
 
 
 def _face_of(name: str) -> Face:
@@ -303,7 +309,7 @@ def solve(
         InvalidStateError: If the state is malformed.
         UnsolvableStateError: If the state cannot occur on a real cube.
         SearchLimitError: If no solution was found inside the depth limits.
-        SolveTimeoutError: If the deadline passed.
+        SolveTimeoutError: If the deadline passed or the node budget ran out.
         CancelledError: If the token was cancelled.
     """
     resolved = limits or SearchLimits()

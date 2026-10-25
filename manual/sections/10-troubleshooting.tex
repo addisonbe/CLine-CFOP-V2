@@ -17,8 +17,8 @@ a $3\times3\times3$. \\
 \texttt{error: the corner orientation sum must be divisible by three} & The state is
 impossible: a single corner is twisted.  Re-check the facelets, or the tool that
 produced them. \\
-\texttt{error: each colour must appear exactly nine times} & A facelet string with
-nine of each colour is the minimum requirement; a missing or duplicated sticker
+\texttt{error: each color must appear exactly nine times} & A facelet string with
+nine of each color is the minimum requirement; a missing or duplicated sticker
 usually means a transcription slip. \\
 \texttt{error: the last layer does not match any case} & The last layer is not in a
 state the tables know.  The pipeline normally catches this and finishes with the
@@ -26,9 +26,10 @@ two-phase solver; seeing the error directly means a table file is damaged. \\
 \texttt{SearchLimitError} & A search was given too small a depth budget.  Raise
 \texttt{SearchLimits.max\_total\_depth} (the default of 30 is generous) or let the
 pair search run to its default depth of twelve. \\
-\texttt{SolveTimeoutError} & A solve exceeded \texttt{SearchLimits.timeout\_ms}.
-Scramble generation uses a one second budget per attempt and redraws a state that
-overruns; a longer budget simply waits. \\
+\texttt{SolveTimeoutError} & A solve exceeded \texttt{SearchLimits.timeout\_ms} or
+\texttt{SearchLimits.max\_nodes}.  Scramble generation gives each attempt a budget of
+400,000 search nodes (about a second) and redraws a state that overruns; counting
+nodes rather than time keeps a seed's scramble identical on every machine. \\
 \texttt{CancelledError} & Someone called \texttt{CancelToken.cancel()}.  Expected
 when an interface abandons a solve; reuse the token with \texttt{reset()}. \\
 Solving feels slow & The F2L search is doing the work: the 41-case table only

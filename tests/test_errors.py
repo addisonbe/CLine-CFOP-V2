@@ -1,6 +1,6 @@
 """Contract tests for the engine exception hierarchy.
 
-These pin the behaviour a GUI/CLI relies on: a stable ``code``, a JSON view and
+These pin the behavior a GUI/CLI relies on: a stable ``code``, a JSON view and
 structured details that never require parsing the message.
 """
 

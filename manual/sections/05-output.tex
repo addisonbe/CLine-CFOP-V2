@@ -5,7 +5,9 @@
 
 The first thing printed is the scrambled cube, unfolded into the usual cross shape:
 the front face in the middle, the upper face above it, the bottom face below it and
-the left, front, right and back faces across a band.
+the left, front, right and back faces across a band.  In the terminal each face is a separate
+block with its name above it (Top, Left, Front, Right, Back, Down), and in color
+mode thin black lines separate the stickers.
 
 \begin{figure}[htbp]
 \centering
@@ -22,13 +24,13 @@ facelet; Section~\ref{sec:notation} gives the facelet numbering.}
 \label{fig:net-scrambled}
 \end{figure}
 
-The cells are drawn in the cube's real colours --- no letters describe a colour, so
+The cells are drawn in the cube's real colors --- no letters describe a color, so
 the picture can be checked at a glance against the physical cube.
 
 \begin{center}
 \begin{tabular}{@{}llll@{}}
 \toprule
-Face & Colour & RGB & Position in the net \\
+Face & Color & RGB & Position in the net \\
 \midrule
 \texttt{U} & white  & \texttt{\#FFFFFF} & above the band \\
 \texttt{L} & orange & \texttt{\#FF5800} & band, first group \\
@@ -44,17 +46,17 @@ Face & Colour & RGB & Position in the net \\
 
 \begin{lstlisting}[style=shell]
 Orientation: zz
-Cross colour: white (bottom layer)
+Cross color: white (bottom layer)
 \end{lstlisting}
 
 The cross is always solved into the bottom layer, so the cube you are shown is
 usually \emph{not} in the orientation it was scrambled in.  \texttt{Orientation}
-records the whole-cube rotation that was applied to put the chosen colour at the
+records the whole-cube rotation that was applied to put the chosen color at the
 bottom (\texttt{none} when no rotation was needed).  For a white cross the top face
 is therefore yellow, as the second line states.
 
 Both lines describe the same picture: compare the bottom face of the net with the
-\texttt{Cross colour} line, and the top face with its opposite.
+\texttt{Cross color} line, and the top face with its opposite.
 
 \subsection{The stages}
 
@@ -73,7 +75,7 @@ Total: 14 moves
 \begin{description}[leftmargin=0em,style=nextline]
   \item[\texttt{Cross}] the moves that solve the four bottom edges.  Optimal: no
   cross needs more than eight moves, and this one is as short as possible for the
-  chosen colour.
+  chosen color.
   \item[\texttt{F2L1} to \texttt{F2L4}] one line per inserted pair, in the order
   front-right, front-left, back-left, back-right.  Each line keeps the cross and
   every earlier pair solved.
@@ -94,14 +96,14 @@ rotations keep the cube in the ``cross down'' orientation the net is drawn in.
 \subsection{Applying the solution}
 
 Read the stages top to bottom and apply the moves in the order printed to the cube
-in the orientation of the net --- the cross colour at the bottom.  The line
+in the orientation of the net --- the cross color at the bottom.  The line
 \texttt{Orientation} tells you how the cube was turned to get there, so you can
 reproduce that orientation on a physical cube.  Every move is standard WCA notation
 (Section~\ref{sec:notation}).
 
 A quick check that you are reading it right: after \texttt{Cross}, the four bottom
-edges and their side centres must form a plus sign, and the bottom face must be
-entirely the cross colour.
+edges and their side centers must form a plus sign, and the bottom face must be
+entirely the cross color.
 
 \subsection{The JSON payload}
 
@@ -120,7 +122,7 @@ entirely the cross colour.
       "label": "F2L1", "kind": "f2l", "moves": ["R'", "F", "R", "F'"],
       "text": "R' F R F'", "length": 4,
       "facelets": "UUFUUFBBURUURRRRRRUUFFFFFFFDDDDDDDDDBLLLLLLLLLRRBBBBBB",
-      "metadata": {"slot": "FR", "case": "1", "case_name": "Same Colour on Top"}
+      "metadata": {"slot": "FR", "case": "1", "case_name": "Same Color on Top"}
     },
     ...
   ],

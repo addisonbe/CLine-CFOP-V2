@@ -7,23 +7,26 @@
 uv run rubiks-cfop --scramble "R U R' U' F2 D"
 \end{lstlisting}
 
-The program prints the scrambled cube as an unfolded net in real colours, then the
+The program prints the scrambled cube as an unfolded net in real colors, then the
 solution stage by stage.  Piped into a file, or with \texttt{--no-color}, the net is
-drawn with coloured squares instead of terminal colours.  A run looks like this:
+drawn with colored squares instead of terminal colors.  A run looks like this:
 
 \begin{lstlisting}[style=shell]
-      ####
-      ####          <- U face (yellow when the cross is white)
-      ####
-##########  ...
-##########  ...     <- L, F, R and B in a band
-##########  ...
-      ####
-      ####          <- D face (the cross colour)
-      ####
+           Top
+        ### ### ###
+        ### ### ###    <- U face (yellow when the cross is white)
+        ### ### ###
+  Left    Front    Right    Back
+### ###  ### ###  ### ###  ### ###  ...
+### ###  ### ###  ### ###  ### ###  ...   <- L, F, R and B in a band
+### ###  ### ###  ### ###  ### ###  ...
+           Down
+        ### ### ###
+        ### ### ###    <- D face (the cross color)
+        ### ### ###
 
 Orientation: none
-Cross colour: yellow (bottom layer)
+Cross color: yellow (bottom layer)
 Scramble: R U R' U' F2 D
 
 Cross: D' F2
@@ -37,7 +40,7 @@ PLL (skip): (none)
 Total: 14 moves
 \end{lstlisting}
 
-(The \texttt{\#} characters stand for coloured cells; Section~\ref{sec:output}
+(The \texttt{\#} characters stand for colored cells; Section~\ref{sec:output}
 shows the real thing.)
 
 \subsection{Generate a scramble and solve it}
@@ -52,7 +55,7 @@ makes it reproducible: the same seed always yields the same scramble.
 
 \begin{lstlisting}[style=shell]
 Orientation: zz
-Cross colour: white (bottom layer)
+Cross color: white (bottom layer)
 Scramble: D B2 F2 L2 U' F2 U B2 R2 U L2 F R' U' B' U L R F D B
 
 Cross: z z R' F D' F2 R' F
@@ -73,7 +76,7 @@ uv run rubiks-cfop --scramble "R U R' U'" --cross white
 uv run rubiks-cfop --scramble "R U R' U'" --cross-options
 \end{lstlisting}
 
-\texttt{--cross} names one of the six colours; \texttt{--cross-options} first lists
+\texttt{--cross} names one of the six colors; \texttt{--cross-options} first lists
 what each of the six crosses would cost, shortest first:
 
 \begin{lstlisting}[style=shell]
@@ -89,7 +92,7 @@ what each of the six crosses would cost, shortest first:
 uv run rubiks-cfop --scramble "R U R' U'" --json
 \end{lstlisting}
 
-The payload carries the scramble, the cross colour, the rotation applied, every
+The payload carries the scramble, the cross color, the rotation applied, every
 stage with its moves and the facelets \emph{after} the stage, the metrics and a
 verification flag.  It is the same structure the Python API returns from
 \texttt{Solution.to\_dict()}, so a GUI or a web front-end can consume it directly;

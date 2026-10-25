@@ -13,6 +13,9 @@ classifiers = [
 [project.scripts]
 rubiks-cfop = "rubiks_cfop.cli:main"
 
+[project.gui-scripts]
+rubiks-cfop-gui = "rubiks_cfop.gui.app:main"
+
 [dependency-groups]
 dev = [
     "hypothesis>=6.115",
@@ -108,6 +111,7 @@ ignore = [
 
 [tool.ruff.lint.per-file-ignores]
 "src/rubiks_cfop/cli.py" = ["T201"]  # the CLI is the one place that prints
+"src/rubiks_cfop/gui/__main__.py" = ["PLR1722"]
 "tests/**/*.py" = [
     "ANN",     # tests are fully annotated in the public API, not necessarily internally
     "ARG",     # fixtures are frequently unused inside the test body

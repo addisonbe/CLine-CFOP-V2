@@ -18,7 +18,7 @@ at a time.  The table takes under a second to build, once per process.
 
 No cross needs more than eight moves, and because the table stores exact distances,
 the reported cross is as short as it possibly can be.  \texttt{--cross best} simply
-repeats the search for all six colours and keeps the shortest.
+repeats the search for all six colors and keeps the shortest.
 
 \subsection{The first two layers}
 
@@ -30,7 +30,7 @@ Two mechanisms cooperate:
 
 \begin{description}[leftmargin=0em,style=nextline]
   \item[The 41 case table] \texttt{data/f2l.json} holds the standard cases, each
-  expressed in the front-right frame.  A slot is recognised by the position and
+  expressed in the front-right frame.  A slot is recognized by the position and
   orientation of its two pieces, and an algorithm is applied --- conjugated by a
   whole-cube turn when the slot is not the front-right one, so the display stays
   cross-down.
@@ -54,7 +54,7 @@ OLL and PLL are lookup tables of 57 and 21 cases.  Recognition does not use
 hand-written pattern descriptions, which are easy to get subtly wrong.  Instead the
 pattern of a case is \emph{computed from the case}: for each algorithm the engine
 applies its inverse to a solved cube, reads off the pattern of the resulting state,
-and stores that as the recognition key.  Table and recogniser therefore cannot
+and stores that as the recognition key.  Table and recognizer therefore cannot
 drift apart.
 
 A case is only defined up to an adjustment of the top face, so every case is stored
@@ -67,8 +67,8 @@ the tables complete.  The test suite proves it by enumerating the whole last lay
 \toprule
 Space & Size & Verified \\
 \midrule
-Orientation states (OLL) & $3^3 \cdot 2^3 = 216$ & every state recognised and oriented \\
-Permutation states (PLL) & $4! \cdot 4! / 2 = 288$ & every state recognised and permuted \\
+Orientation states (OLL) & $3^3 \cdot 2^3 = 216$ & every state recognized and oriented \\
+Permutation states (PLL) & $4! \cdot 4! / 2 = 288$ & every state recognized and permuted \\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -127,7 +127,7 @@ Step & Typical cost \\
 \midrule
 Build the scrambler tables (first use only) & 10 s \\
 Generate a random-state scramble & 0.1--0.5 s \\
-Cross, all six colours & under 1 ms \\
+Cross, all six colors & under 1 ms \\
 Four F2L pairs & 0.5--4 s (search-bound; see below) \\
 OLL and PLL & under 5 ms \\
 Whole solve & 0.7--4 s, 54 to 62 moves \\

@@ -126,15 +126,15 @@ def test_apply_to_rejects_wrong_length() -> None:
 
 
 def test_slice_moves_rotate_the_middle_layer_only() -> None:
-    # M follows L, so the top centre receives the back colour and R/L are untouched.
+    # M follows L, so the top center receives the back color and R/L are untouched.
     assert face_facelets(apply(("M",)), Face.U)[4] == "B"
     assert face_facelets(apply(("M",)), Face.R)[4] == "R"
     assert face_facelets(apply(("M",)), Face.L)[4] == "L"
-    # E follows D, so the front centre receives the left colour and U/D are untouched.
+    # E follows D, so the front center receives the left color and U/D are untouched.
     assert face_facelets(apply(("E",)), Face.F)[4] == "L"
     assert face_facelets(apply(("E",)), Face.U)[4] == "U"
     assert face_facelets(apply(("E",)), Face.D)[4] == "D"
-    # S follows F, so the top centre receives the left colour and F/B are untouched.
+    # S follows F, so the top center receives the left color and F/B are untouched.
     assert face_facelets(apply(("S",)), Face.U)[4] == "L"
     assert face_facelets(apply(("S",)), Face.F)[4] == "F"
     assert face_facelets(apply(("S",)), Face.B)[4] == "B"
@@ -174,7 +174,7 @@ def test_rotations_keep_faces_uniform() -> None:
 
 
 def test_rotation_face_mapping() -> None:
-    """After a rotation, a face shows the colour that was on the rotated-away face."""
+    """After a rotation, a face shows the color that was on the rotated-away face."""
     expected = {
         "x": {"U": "F", "F": "D", "D": "B", "B": "U", "R": "R", "L": "L"},
         "y": {"F": "R", "R": "B", "B": "L", "L": "F", "U": "U", "D": "D"},
@@ -186,7 +186,7 @@ def test_rotation_face_mapping() -> None:
             assert face_facelets(state, face)[4] == letter, (rotation, face)
 
 
-def test_normalisation_undoes_rotations() -> None:
+def test_normalization_undoes_rotations() -> None:
     scrambled = apply(("R", "U", "R'", "U'", "F2"))
     for sequence in rotations():
         assert normalized_facelets(apply(sequence, scrambled)) == scrambled
@@ -197,10 +197,10 @@ def test_rotation_to_normalize_is_empty_for_canonical_states() -> None:
     assert rotation_to_normalize(apply(("R", "U", "y", "y'"))) == ()
 
 
-def test_rotation_to_normalize_rejects_impossible_centres() -> None:
-    """Centres that are not a rotation of the solved arrangement cannot occur."""
+def test_rotation_to_normalize_rejects_impossible_centers() -> None:
+    """Centers that are not a rotation of the solved arrangement cannot occur."""
     facelets = list(SOLVED_FACELETS)
-    facelets[4], facelets[31] = facelets[31], facelets[4]  # swap the U and D centres
+    facelets[4], facelets[31] = facelets[31], facelets[4]  # swap the U and D centers
     with pytest.raises(InvalidStateError, match="not a rotation"):
         rotation_to_normalize("".join(facelets))
 
